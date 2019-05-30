@@ -4,16 +4,28 @@
 
 #include "../includes/arithmetic.h"
 
+/**
+ * This function with add two strinsg together.
+ * @param op1
+ * @param op2
+ * @return
+ */
 std::string Add(std::string &op1, std::string &op2) {
   // todo : check negatives (check first array)
   bool negative = false;
 
-  if (op1[0] == '-')
+  if (op1[0] == '-') {
     if (op2[0] == '-') {
       negative = true;
       op1 = op1.substr(1);
       op2 = op2.substr(1);
+    } else { // op1 (-), op2 (+)
+      return Subtract(op2, op1);
     }
+  } else if (op2[0] == '-') { // op1 (+), op2 (-)
+    op2 = op2.substr(1);
+    return Subtract(op1, op2);
+  }
 
   if (op2.size() > op1.size())
     std::swap(op1,op2);
@@ -85,7 +97,7 @@ std::string Subtract(std::string &op1, std::string &op2) {
 
   if (IsSmaller(op1,op2)) {
     std::swap(op1, op2);
-    negative = true;
+    negative = !negative;
   }
 
   std::string diff = op1;  // Make a copy of the largest number and subtract the smaller number from it
@@ -93,11 +105,22 @@ std::string Subtract(std::string &op1, std::string &op2) {
 
   for (int i = op2.size()-1; i >= 0; --i, --diff_it) {
 
+
     if (diff[diff_it] < op2[i]) {
-      --diff[diff_it-1]; // borrow 1 from the next digit
-      diff[diff_it] += 10 - (op2[i]-'0');
-    } else
+      if (diff[diff_it-1]-'0' != 0) {
+        --diff[diff_it-1];
+      } else { // borrow 1 from the next digit
+        int count = diff_it-1;
+        while (diff[count] == '0') {
+          diff[count] = '9';
+          --count;
+        }
+        --diff[count];
+      }
+      diff[diff_it] += (10 - (op2[i]-'0'));
+    } else {
       diff[diff_it] -= (op2[i]-'0');
+    }
 
   }
 
