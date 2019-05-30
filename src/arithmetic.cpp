@@ -45,15 +45,30 @@ std::vector<int> Add(std::vector<int> &op1, std::vector<int> &op2) {
 
 }
 
-std::vector<int> Subtract(std::vector<int> &op1, std::vector<int> &op2) {
+std::vector<int> Subtract(const std::string &op1, const std::string &op2) {
   // todo check for negatives
-  if (op2.size() > op1.size())
-    std::swap(op1,op2);
+  bool negative = false;
 
+  // If both strings are negative, then we need to
+//  if (IsSmaller(op1, op2)) {
+//    std::swap(op1,op2);
+//    negative = true;
+//  }
 
-  unsigned int carry = 0;
-  std::vector<int> sum = op1; // Make a copy of the largest number and add the smaller number to it
+  // op1 is bigger than op2
 
+  std::vector<int> diff = op1;  // Make a copy of the largest number and subtract the smaller number from it
+  auto diff_pos = op1.rbegin();
+
+  for (auto it = op2.rbegin(); it != op2.rend(); ++it, ++diff_pos) {
+
+    if (*it > *diff_pos) {
+      *diff_pos += 10 - *it;
+      *(diff_pos+1) -= 1;
+    }
+  }
+
+  return diff;
 }
 
 bool IsSmaller(std::vector<int> &op1, std::vector<int> &op2) {

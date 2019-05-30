@@ -10,9 +10,10 @@ int main() {
 
   std::vector<int> num1 = StringToVector(op1);
   std::vector<int> num2 = StringToVector(op2);
-  std::vector<int> sum = Add(num1, num2);
+  std::vector<int> diff = Subtract(num1, num2);
 
-  printf("%s", IsSmaller(num1, num2) ? "true" : "false" );
+//  printf("%s", IsSmaller(num1, num2) ? "true" : "false" );
+  Output(diff, std::cout);
 
   return 0;
 }
