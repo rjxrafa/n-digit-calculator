@@ -2,7 +2,7 @@
 // Created by rafab on 5/29/2019.
 //
 
-#include "../includes/add.h"
+#include "../includes/arithmetic.h"
 
 std::vector<int> Add(std::vector<int> &op1, std::vector<int> &op2) {
   // todo : check negatives (check first array)
@@ -42,5 +42,34 @@ std::vector<int> Add(std::vector<int> &op1, std::vector<int> &op2) {
   }
 
   return sum;
+
+}
+
+std::vector<int> Subtract(std::vector<int> &op1, std::vector<int> &op2) {
+  // todo check for negatives
+  if (op2.size() > op1.size())
+    std::swap(op1,op2);
+
+
+  unsigned int carry = 0;
+  std::vector<int> sum = op1; // Make a copy of the largest number and add the smaller number to it
+
+}
+
+bool IsSmaller(std::vector<int> &op1, std::vector<int> &op2) {
+
+  if (op1.size() < op2.size())
+    return true;
+  if (op1.size() > op2.size())
+    return false;
+
+  for (int i = 0; i < op1.size(); ++i) {
+    if (op1[i] < op2[i])
+      return true;
+    else if (op1[i] > op2[i])
+      return false;
+  }
+
+  return false;
 
 }

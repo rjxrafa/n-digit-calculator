@@ -12,6 +12,7 @@ int main() {
   std::vector<int> num2 = StringToVector(op2);
   std::vector<int> sum = Add(num1, num2);
 
+  printf("%s", IsSmaller(num1, num2) ? "true" : "false" );
 
   return 0;
 }
