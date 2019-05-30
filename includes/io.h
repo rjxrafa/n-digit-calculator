@@ -8,7 +8,8 @@
 #include "mylib.h"
 
 bool GetInput(std::string &input, std::string &&question);
-std::vector<int> ParseString(std::string &input);
-void Output(std::vector<int> &output, std::ostream &out);
+std::vector<int> StringToVector(const std::string &input);
+std::vector<int> StringToVector(const char *cstr);
+void Output(const std::vector<int> &output, std::ostream &out);
 
 #endif //N_DIGIT_CALCULATOR__INPUT_H_

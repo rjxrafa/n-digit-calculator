@@ -30,7 +30,7 @@ bool GetInput(std::string &input, std::string &&question) {
  * @param input
  * @return vector<char>
  */
-std::vector<int> ParseString(std::string &input) {
+std::vector<int> StringToVector(const std::string &input) {
 
   std::vector<int> number;
   for (auto &x : input) {
@@ -41,11 +41,29 @@ std::vector<int> ParseString(std::string &input) {
 }
 
 /**
+ * This function parses a given cstring and inserts all characters into a vector.
+ * @param cstr
+ * @return
+ */
+std::vector<int> StringToVector(const char *cstr) {
+
+  std::vector<int> number;
+  auto it = 0;
+
+  while (cstr[it] != '\0') {
+    number.push_back(cstr[it++]-'0');
+  }
+
+  return number;
+}
+
+
+/**
  * This function will output to a given output stream a given vector
  * @param output
  * @param out
  */
-void Output(std::vector<int> &output, std::ostream &out) {
+void Output(const std::vector<int> &output, std::ostream &out) {
   for (auto &x : output) {
     out << x;
   }

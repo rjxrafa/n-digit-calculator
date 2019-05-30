@@ -8,6 +8,6 @@ set(SOURCES src/io.cpp
 
 set(INCLUDES    includes/mylib.h
                 includes/io.h
-                includes/add.h)
+                includes/add.h src/multiply.cpp includes/multiply.h)
 
 add_executable(n_digit_calculator main.cpp ${SOURCES} ${INCLUDES})
