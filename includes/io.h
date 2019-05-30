@@ -7,7 +7,7 @@
 
 #include "mylib.h"
 
-bool GetInput(std::string &input);
+bool GetInput(std::string &input, std::string &&question);
 std::vector<int> ParseString(std::string &input);
 void Output(std::vector<int> &output, std::ostream &out);
 
