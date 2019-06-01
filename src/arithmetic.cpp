@@ -20,7 +20,8 @@ std::string Add(std::string &op1, std::string &op2) {
       op1 = op1.substr(1);
       op2 = op2.substr(1);
     } else { // op1 (-), op2 (+)
-      return Subtract(op2, op1);
+      op1 = op1.substr(1);
+      return '-' + Subtract(op1, op2);
     }
   } else if (op2[0] == '-') { // op1 (+), op2 (-)
     op2 = op2.substr(1);
@@ -131,6 +132,12 @@ std::string Subtract(std::string &op1, std::string &op2) {
   return diff.empty() ? diff+'0' : (negative) ? ('-'+diff) : (diff);
 }
 
+/**
+ * This is a helper function to determine which of two operands are smaller
+ * @param op1
+ * @param op2
+ * @return
+ */
 bool IsSmaller(std::string &op1, std::string &op2) {
 
   if (op1.size() < op2.size())
@@ -146,3 +153,89 @@ bool IsSmaller(std::string &op1, std::string &op2) {
   }
   return false;
 }
+
+/**
+ * This is a function that multiplies two n-digit strings.
+ * @param op1
+ * @param op2
+ * @return
+ */
+std::string Multiply(std::string &op1, std::string &op2) {
+
+  bool negative = false;
+
+  if (op1[0] == '-') {
+    negative = !negative;
+    op1 = op1.substr(1);
+  }
+
+  if (op2[0] == '-') {
+    negative = !negative;
+    op2 = op2.substr(1);
+  }
+
+  if (op1.size() < op2.size()) {
+    std::swap(op1,op2);
+  }
+
+  std::reverse(op1.begin(), op1.end());
+  std::reverse(op2.begin(), op2.end());
+
+  std::string product = "0", temp_product;
+  int carry = 0;
+  for (unsigned int i = 0; i < op1.size(); ++i) {
+    temp_product = "";
+    for (unsigned int j = 0; j < op2.size(); ++j) {
+      int temp = (op1[i]-'0') * (op2[j]-'0') + carry;
+      carry = 0;
+      if (temp > 9) {
+        carry = temp/10;
+      }
+      temp_product = std::to_string(temp%10) + temp_product;
+    }
+
+    if (carry) {
+      temp_product = std::to_string(carry) + temp_product;
+      carry = 0;
+    }
+
+    for (int k = 0; k < i; ++k) {
+      temp_product += '0';
+    }
+
+    product = Add(temp_product, product);
+  }
+
+  if (negative)
+    product = '-' + product;
+
+
+  std::reverse(op1.begin(), op1.end());
+  std::reverse(op2.begin(), op2.end());
+
+  return product.empty() ? "0" : product;
+
+}
+
+std::string Factorial(std::string &op, const bool &&threaded){
+
+  if (op == "0")
+    return "1";
+
+  if (op[0] == '-') {
+    printf("Invalid input! No negative numbers allowed.\n");
+    return op;
+  }
+
+  std::string factorial = "1",
+              temp = "1",
+              increment = "1";
+
+  while (temp != op) {
+    temp = Add(temp, increment);
+    factorial = Multiply(factorial, temp);
+  }
+
+  return factorial;
+}
+

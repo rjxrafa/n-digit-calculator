@@ -1,19 +1,24 @@
 #include "includes/io.h"
-#include "includes/multiply.h"
+#include "includes/arithmetic.h"
+#include <thread>
+#include <afxres.h>
 
 int main() {
 
-  std::string op1, op2, sum;
+  std::string op1, op2, prod;
 
   while (1) {
+    std::thread a;
+//    CreateThread a;
+//    a
     while (!GetInput(op1, "Enter operand 1: "));
-    while (!GetInput(op2, "Enter operand 2: "));
-    sum = Subtract(op1, op2);
-    std::cout << sum << '\n';
+//    while (!GetInput(op2, "Enter operand 2: "));
+//    prod = Multiply(op1, op2);
+//    std::cout << prod << '\n';
+
+//    std::cout << Factorial(op1) << '\n';
+    std::cout << CommaSeparator(op1) << std::endl;
   }
-
-//  printf("%s", IsSmaller(num1, num2) ? "true" : "false" );
-
 
   return 0;
 }

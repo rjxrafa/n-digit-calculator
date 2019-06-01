@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include <cstdlib>
+#include <algorithm>
 
 
 #endif //N_DIGIT_CALCULATOR__MYLIB_H_
