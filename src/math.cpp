@@ -2,7 +2,7 @@
 // Created by rafab on 5/29/2019.
 //
 
-#include "../includes/arithmetic.h"
+#include "../includes/math.h"
 
 /**
  * This function with add two strinsg together.
@@ -250,9 +250,10 @@ std::string Factorial(std::string &op, const bool &&threaded){
  *
  * @param op1 dividend
  * @param op2 divisor
+ * @param mod if true, returns the result of the remainder
  * @return quotient
  */
-std::string Divide(std::string op1, std::string op2) {
+std::string Divide(std::string op1, std::string op2, const bool &&mod) {
 
   bool negative = false;
 
@@ -319,6 +320,9 @@ std::string Divide(std::string op1, std::string op2) {
     if (remainder != "0")
       quotient.append(' '+remainder+'/'+op2);
 
+    if (mod)
+      return remainder;
+
     return (negative) ? '-'+quotient : quotient;
   }
 }
@@ -343,6 +347,62 @@ std::string Power(std::string op1, std::string op2) {
   }
 
   return result;
+
+}
+
+void GenerateDivisors(std::vector<std::string> &v, const std::string &num) {
+  std::string it = "1";
+
+  while (it != num) {
+
+    std::string temp = Divide(num, it);
+    if (temp.find("/") == std::string::npos) {
+      v.push_back(temp);
+    }
+    it = Add(it, "1");
+  }
+}
+/**
+ * This function calculates the GCD for two given operands. This implementation uses the Euclidian algorithm for
+ * finding GCD between two numbers.
+ * @param op1
+ * @param op2
+ * @return
+ */
+std::string GCD(std::string op1, std::string op2) {
+
+  if (op1[0] == '-') {
+    op1 = op1.substr(1);
+  }
+
+  if (op2[0] == '-') {
+    op2 = op2.substr(1);
+  }
+
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (op2.empty() || op1.empty()) {
+    printf("Divison by zero! Error.\n");
+    return "NaN";
+  }
+
+  if (IsSmaller(op1, op2))
+    std::swap(op1, op2);
+
+  std::string remainder = Divide(op1, op2, true);
+  std::string a = op2, b = remainder;
+
+  while (remainder != "0") {
+    remainder = Divide(a, b, true);
+    a = b;
+    b = remainder;
+  }
+
+  return a;
 
 }
 

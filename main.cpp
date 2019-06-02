@@ -1,7 +1,5 @@
 #include "includes/io.h"
-#include "includes/arithmetic.h"
-#include <thread>
-#include <afxres.h>
+#include "includes/math.h"
 
 int main() {
 
@@ -10,13 +8,8 @@ int main() {
   while (1) {
     while (!GetInput(op1, "Enter operand 1: "));
     while (!GetInput(op2, "Enter operand 2: "));
-//    prod = Multiply(op1, op2);
-//    std::cout << prod << '\n';
 
-//    std::cout << Factorial(op1) << '\n';
-    std::cout << Divide(op1, op2) << std::endl;
-
-
+    std::cout << GCD(op1,op2);
   }
 
   return 0;
