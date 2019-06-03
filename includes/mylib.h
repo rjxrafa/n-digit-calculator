@@ -10,6 +10,6 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
-
+#include <cmath>
 
 #endif //N_DIGIT_CALCULATOR__MYLIB_H_
