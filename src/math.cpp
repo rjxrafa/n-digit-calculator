@@ -13,6 +13,15 @@
 std::string Add(std::string op1, std::string op2) {
   bool negative = false;
 
+  bool fraction_op1 = false;
+  bool fraction_op2 = false;
+
+  if (op1.find('/') == std::string::npos)
+    fraction_op1 = true;
+
+  if (op1.find('/') < std::string::npos)
+    fraction_op2 = true;
+
   if (op1[0] == '-') {
     if (op2[0] == '-') {
       negative = true;
@@ -402,8 +411,13 @@ std::string GCD(std::string op1, std::string op2) {
     a = b;
     b = remainder;
   }
-
   return a;
+}
+std::string Negate(std::string &op) {
 
+  if (op[0] == '-')
+    return op.substr(1);
+  else
+    return '-'+op;
 }
 
