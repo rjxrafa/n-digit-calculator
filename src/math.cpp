@@ -2,7 +2,7 @@
 // Created by rafab on 5/29/2019.
 //
 
-#include "../includes/arithmetic.h"
+#include "../includes/math.h"
 
 /**
  * This function with add two strinsg together.
@@ -10,8 +10,7 @@
  * @param op2
  * @return
  */
-std::string Add(std::string &op1, std::string &op2) {
-  // todo : check negatives (check first array)
+std::string Add(std::string op1, std::string op2) {
   bool negative = false;
 
   if (op1[0] == '-') {
@@ -21,7 +20,7 @@ std::string Add(std::string &op1, std::string &op2) {
       op2 = op2.substr(1);
     } else { // op1 (-), op2 (+)
       op1 = op1.substr(1);
-      return '-' + Subtract(op1, op2);
+      return Subtract(op2, op1);
     }
   } else if (op2[0] == '-') { // op1 (+), op2 (-)
     op2 = op2.substr(1);
@@ -78,7 +77,7 @@ std::string Add(std::string &op1, std::string &op2) {
  * @param op2
  * @return
  */
-std::string Subtract(std::string &op1, std::string &op2) {
+std::string Subtract(std::string op1, std::string op2) {
   // todo check for negatives
   bool negative = false;
 
@@ -138,7 +137,7 @@ std::string Subtract(std::string &op1, std::string &op2) {
  * @param op2
  * @return
  */
-bool IsSmaller(std::string &op1, std::string &op2) {
+bool IsSmaller(const std::string &op1, const std::string &op2) {
 
   if (op1.size() < op2.size())
     return true;
@@ -160,7 +159,7 @@ bool IsSmaller(std::string &op1, std::string &op2) {
  * @param op2
  * @return
  */
-std::string Multiply(std::string &op1, std::string &op2) {
+std::string Multiply(std::string op1, std::string op2) {
 
   bool negative = false;
 
@@ -217,6 +216,11 @@ std::string Multiply(std::string &op1, std::string &op2) {
 
 }
 
+/**
+ * @param op
+ * @param threaded
+ * @return
+ */
 std::string Factorial(std::string &op, const bool &&threaded){
 
   if (op == "0")
@@ -237,5 +241,168 @@ std::string Factorial(std::string &op, const bool &&threaded){
   }
 
   return factorial;
+}
+
+/**
+ * This function performs division between two operands. This function uses the restoring diviison algorithm
+ * which can be found here:
+ *  https://web.stanford.edu/class/ee486/doc/chap5.pdf
+ *
+ * @param op1 dividend
+ * @param op2 divisor
+ * @param mod if true, returns the result of the remainder
+ * @return quotient
+ */
+std::string Divide(std::string op1, std::string op2, const bool &&mod) {
+
+  bool negative = false;
+
+  if (op1[0] == '-') {
+    negative = !negative;
+    op1 = op1.substr(1);
+  }
+
+  if (op2[0] == '-') {
+    negative = !negative;
+    op2 = op2.substr(1);
+  }
+
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (op2.empty()) {
+    printf("Divison by zero! Error.\n");
+    return "NaN";
+  }
+
+  if (op1 == op2)
+    return (negative) ? "-1" :"1";
+
+  if (IsSmaller(op1, op2)) {
+    if (negative)
+      op1 = '-'+op1;
+    return op1 + "/"+ op2;
+  } else {
+
+    /**
+     * Let
+     * N = numerator
+     * D = denominator
+     * op1.length()-1 = # of bits
+     * R = partial remainder
+     * q(i) bit #i of quotient
+     */
+
+    std::string remainder = op1;
+    std::string quotient(op1.length(), '0');
+    int q_i = 1;
+
+    for (int i = op1.length()-1; i >= 0; ) {
+      remainder = Subtract(remainder, Multiply(op2, Power("10", std::to_string(i))));
+
+      if (remainder[0] == '-') {
+        quotient[i] = (q_i-1)+'0';
+        q_i = 1;
+        remainder = Add(remainder, Multiply(op2, Power("10", std::to_string(i))));
+        --i;
+      }
+      else
+        ++q_i;
+    }
+
+    std::reverse(quotient.begin(), quotient.end());
+    while (quotient[0] == '0')
+      quotient = quotient.substr(1);
+
+    if (remainder != "0")
+      quotient.append(' '+remainder+'/'+op2);
+
+    if (mod)
+      return remainder;
+
+    return (negative) ? '-'+quotient : quotient;
+  }
+}
+
+/**
+ * This power will take a given
+ * @param op1
+ * @param op2
+ * @return
+ */
+std::string Power(std::string op1, std::string op2) {
+  // todo, negative powers
+
+  if (op2 == "0")
+    return "1";
+
+  std::string result = op1;
+
+  while (op2 != "1") {
+    op2 = Subtract(op2, "1");
+    result = Multiply(result, op1);
+  }
+
+  return result;
+
+}
+
+void GenerateDivisors(std::vector<std::string> &v, const std::string &num) {
+  std::string it = "1";
+
+  while (it != num) {
+
+    std::string temp = Divide(num, it);
+    if (temp.find("/") == std::string::npos) {
+      v.push_back(temp);
+    }
+    it = Add(it, "1");
+  }
+}
+/**
+ * This function calculates the GCD for two given operands. This implementation uses the Euclidian algorithm for
+ * finding GCD between two numbers.
+ * @param op1
+ * @param op2
+ * @return
+ */
+std::string GCD(std::string op1, std::string op2) {
+
+  if (op1[0] == '-') {
+    op1 = op1.substr(1);
+  }
+
+  if (op2[0] == '-') {
+    op2 = op2.substr(1);
+  }
+
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (op2.empty() || op1.empty()) {
+    printf("Divison by zero! Error.\n");
+    return "NaN";
+  }
+
+  if (IsSmaller(op1, op2))
+    std::swap(op1, op2);
+
+  std::string remainder = Divide(op1, op2, true);
+  std::string a = op2, b = remainder;
+
+  while (remainder != "0") {
+    remainder = Divide(a, b, true);
+    a = b;
+    b = remainder;
+  }
+
+  return a;
+
 }
 

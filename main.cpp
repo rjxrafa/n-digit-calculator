@@ -8,9 +8,7 @@
 
 #include "includes/io.h"
 #include "includes/mylib.h"
-#include "includes/arithmetic.h"
-#include <thread>
-#include <afxres.h>
+#include "includes/math.h"
 
 using namespace std;
 
@@ -54,21 +52,6 @@ int main()
         process(line, commands, expressions, stored);
     exit(line, expressions, stored);
     return 0;
-
-//  std::string op1, op2, prod;
-
-//  while (1) {
-//    std::thread a;
-////    CreateThread a;
-////    a
-//    while (!GetInput(op1, "Enter operand 1: "));
-//    while (!GetInput(op2, "Enter operand 2: "));
-//    prod = Add(op1, op2);
-//    std::cout << prod << '\n';
-
-////    std::cout << Factorial(op1) << '\n';
-////    std::cout << CommaSeparator(op1) << std::endl;
-//  }
 
   return 0;
 }
@@ -411,7 +394,6 @@ void exit(const string &suffix, map<int, string> expressions, bool stored)
 {
     //this part asks if the user wants to save their current expressions
     //will only ask if they did not save right before asking the program to end
-
     if(stored) {
         std::cout << "Thank You!" << std::endl;
         exit(1);
@@ -676,22 +658,22 @@ string rpnEval(const string& postfix)
                     result = Subtract(second, first);
                     outputStack.push_back(result);
                     break;
-//                case '*':
-//                    first = outputStack.back();
-//                    outputStack.pop_back();
-//                    second = outputStack.back();
-//                    outputStack.pop_back();
-//                    result = setIntersection(second, first);
-//                    outputStack.push_back(result);
-//                    break;
-//                case '/':
-//                    first = outputStack.back();
-//                    outputStack.pop_back();
-//                    second = outputStack.back();
-//                    outputStack.pop_back();
-//                    result = setDifference(second, first);
-//                    outputStack.push_back(result);
-//                    break;
+                case '*':
+                    first = outputStack.back();
+                    outputStack.pop_back();
+                    second = outputStack.back();
+                    outputStack.pop_back();
+                    result = Multiply(second, first);
+                    outputStack.push_back(result);
+                    break;
+                case '/':
+                    first = outputStack.back();
+                    outputStack.pop_back();
+                    second = outputStack.back();
+                    outputStack.pop_back();
+                    result = Divide(second, first);
+                    outputStack.push_back(result);
+                    break;
                 default:
                     break;
             }
@@ -707,7 +689,8 @@ string rpnEval(const string& postfix)
  */
 bool loadPrecedence(map<char, int> &operators)
 {
-    try {
+    try
+    {
         operators['+'] = 2u;
         operators['-'] = 2u;
         operators['*'] = 1u;
