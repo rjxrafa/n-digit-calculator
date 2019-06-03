@@ -5,13 +5,22 @@
 #include "../includes/math.h"
 
 /**
- * This function with add two strinsg together.
+ * This function with add two strings together.
  * @param op1
  * @param op2
  * @return
  */
 std::string Add(std::string op1, std::string op2) {
   bool negative = false;
+
+  bool fraction_op1 = false;
+  bool fraction_op2 = false;
+
+  if (op1.find('/') == std::string::npos)
+    fraction_op1 = true;
+
+  if (op1.find('/') < std::string::npos)
+    fraction_op2 = true;
 
   if (op1[0] == '-') {
     if (op2[0] == '-') {
@@ -72,7 +81,7 @@ std::string Add(std::string op1, std::string op2) {
 }
 
 /**
- * This function subtracts first operand from second operand.
+ * This function subtracts the first operand from second operand.
  * @param op1
  * @param op2
  * @return
@@ -132,7 +141,7 @@ std::string Subtract(std::string op1, std::string op2) {
 }
 
 /**
- * This is a helper function to determine which of two operands are smaller
+ * This is a helper function to determine which of two operands are smaller.
  * @param op1
  * @param op2
  * @return
@@ -216,6 +225,7 @@ std::string Multiply(std::string op1, std::string op2) {
 }
 
 /**
+ * This function computes a given number's factorial.
  * @param op
  * @param threaded
  * @return
@@ -399,7 +409,16 @@ std::string GCD(std::string op1, std::string op2) {
     a = b;
     b = remainder;
   }
-
   return a;
+<<<<<<< HEAD
+=======
+}
+std::string Negate(std::string &op) {
+
+  if (op[0] == '-')
+    return op.substr(1);
+  else
+    return '-'+op;
+>>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
 }
 

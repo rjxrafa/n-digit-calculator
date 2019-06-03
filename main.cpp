@@ -40,6 +40,7 @@ bool loadPrecedence(map<char, int> &operators);
 void help();
 
 
+<<<<<<< HEAD
 int main()
 {
     introduction();
@@ -52,6 +53,11 @@ int main()
         process(line, commands, expressions, stored);
     exit(line, expressions, stored);
     return 0;
+=======
+    std::cout << CommaSeparator(Factorial(op1)) << std::endl;
+    std::cout << GCD(op1,op2);
+  }
+>>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
 
   return 0;
 }
