@@ -5,7 +5,7 @@
 #include "../includes/arithmetic.h"
 
 /**
- * This function with add two strinsg together.
+ * This function with add two strings together.
  * @param op1
  * @param op2
  * @return
@@ -73,7 +73,7 @@ std::string Add(std::string &op1, std::string &op2) {
 }
 
 /**
- * This function subtracts first operand from second operand.
+ * This function subtracts the first operand from second operand.
  * @param op1
  * @param op2
  * @return
@@ -133,7 +133,7 @@ std::string Subtract(std::string &op1, std::string &op2) {
 }
 
 /**
- * This is a helper function to determine which of two operands are smaller
+ * This is a helper function to determine which of two operands are smaller.
  * @param op1
  * @param op2
  * @return
@@ -217,6 +217,12 @@ std::string Multiply(std::string &op1, std::string &op2) {
 
 }
 
+/**
+ * This function computes a given number's factorial.
+ * @param op
+ * @param threaded
+ * @return
+ */
 std::string Factorial(std::string &op, const bool &&threaded){
 
   if (op == "0")

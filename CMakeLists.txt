@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.5.1)
 project(n_digit_calculator)
 
 
@@ -17,4 +17,3 @@ set(INCLUDES    includes/mylib.h
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 add_executable(n_digit_calculator main.cpp ${SOURCES} ${INCLUDES})
-#target_link_libraries(n_digit_calculator pthread)
