@@ -40,25 +40,27 @@ void help();
 
 int main()
 {
-  introduction();
-  map<int, string> expressions;
-  map<string, int> commands;
-  string line;
-  bool stored = false;
-  loadCommands(commands);
-  while(getLine(line))
-    process(line, commands, expressions, stored);
-  exit(line, expressions, stored);
-  return 0;
+//  introduction();
+//  map<int, string> expressions;
+//  map<string, int> commands;
+//  string line;
+//  bool stored = false;
+//  loadCommands(commands);
+//  while(getLine(line))
+//    process(line, commands, expressions, stored);
+//  exit(line, expressions, stored);
+//  return 0;
 
-//  while (1) {
-//    while (!GetInput(op1, "Enter operand 1: "));
+  while (1) {
+    std::string op1, op2, prod;
+    while (!GetInput(op1, "Enter operand 1: "));
 //    while (!GetInput(op2, "Enter operand 2: "));
-//    prod = GCD(op1, op2);
-//    prod = Factorial(op1);
-//    std::cout << prod << std::endl;
-//    std::cout << CommaSeparator(Factorial(op1)) << std::endl;
-//    std::cout << GCD(op1,op2);
+    prod = SimplifyFraction(op1);
+//    prod = Divide(op1, op2);
+    std::cout << prod << std::endl;
+//    std::cout << CommaSeparator(op1) << std::endl;
+//    std::cout << GCD(op1, op2);
+  }
 }
 
 void introduction()
@@ -111,7 +113,7 @@ void trimLineAndStandardize(string &line)
   while((pos = line.find(' ', ++pos)) < line.size())
     while(line[pos+1] == ' ')
       line.erase(pos+1,1);
-  while((pos = line.find('\t ', ++pos)) < line.size())
+  while((pos = line.find('\t', ++pos)) < line.size())
     while(line[pos+1] == '\t')
       line.erase(pos+1,1);
   //modifies input so all chars are uppercase
@@ -517,101 +519,101 @@ void load(const string &suffix, map<int, string>& expressions)
   in.close();
 }
 
-string formatInfix(string& infix)
-{
-  //removes all whitespaces
-  input = input.replaceAll("\\s+", "");
-  String formatted = "";
-  boolean negative_start = false;
-
-  for (int i = 0; i < input.length(); ++i)
-  {
-    //negative check
-    if(input.charAt(0) == '-' && !negative_start)
-    {
-      negative_start = true;
-      formatted += '~';
-      formatted += " ";
-      while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
-      {
-        i++;
-        formatted += input.charAt(i);
-      }
-      formatted += " ";
-    }
-      //EX. formatting 123.123
-    else if (Character.isDigit(input.charAt(i)))
-    {
-      formatted += input.charAt(i);
-      while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
-      {
-        i++;
-        formatted += input.charAt(i);
-      }
-      formatted += " ";
-    }
-      //+123.23
-    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
-    {
-      formatted += input.charAt(i);
-      formatted += " ";
-      //negative check
-      if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
-      {
-        i++;
-        formatted += '~';
-        formatted += " ";
-        while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
-        {
-          i++;
-          formatted += input.charAt(i);
-        }
-        formatted += " ";
-      }
-    }
-      //if left parenthesis, check for negatives after
-    else if( input.charAt(i) == '(')
-    {
-      formatted += input.charAt(i);
-      formatted += " ";
-      //(-123
-      if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
-      {
-        if (i + 2 < input.length() && (Character.isDigit(input.charAt(i + 2)) || input.charAt(i + 2) == '.'))
-        {
-          formatted += '~';
-          formatted += " ";
-          formatted += input.charAt(i+2);
-          i++;
-          i++;
-          while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
-          {
-            i++;
-            formatted += input.charAt(i);
-          }
-          formatted+= " ";
-        }
-        else if(i+2 < input.length() && input.charAt(i+2) == '(')
-        {
-          formatted += '~';
-          formatted += " ";
-          i++;
-        }
-      }
-    }
-      //if right parenthesis add it to formated
-    else if(input.charAt(i) == ')')
-    {
-      formatted += input.charAt(i);
-      formatted += " ";
-    }
-      //if user enters x
-    else if (input.charAt(i) == 'X' || input.charAt(i) == 'x')
-      Term_Project.chooseMode();
-    //throw error
-  }
-  return formatted;
-}
+//string formatInfix(string& infix)
+//{
+//  //removes all whitespaces
+//  input = input.replaceAll("\\s+", "");
+//  String formatted = "";
+//  boolean negative_start = false;
+//
+//  for (int i = 0; i < input.length(); ++i)
+//  {
+//    //negative check
+//    if(input.charAt(0) == '-' && !negative_start)
+//    {
+//      negative_start = true;
+//      formatted += '~';
+//      formatted += " ";
+//      while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+//      {
+//        i++;
+//        formatted += input.charAt(i);
+//      }
+//      formatted += " ";
+//    }
+//      //EX. formatting 123.123
+//    else if (Character.isDigit(input.charAt(i)))
+//    {
+//      formatted += input.charAt(i);
+//      while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+//      {
+//        i++;
+//        formatted += input.charAt(i);
+//      }
+//      formatted += " ";
+//    }
+//      //+123.23
+//    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
+//    {
+//      formatted += input.charAt(i);
+//      formatted += " ";
+//      //negative check
+//      if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
+//      {
+//        i++;
+//        formatted += '~';
+//        formatted += " ";
+//        while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+//        {
+//          i++;
+//          formatted += input.charAt(i);
+//        }
+//        formatted += " ";
+//      }
+//    }
+//      //if left parenthesis, check for negatives after
+//    else if( input.charAt(i) == '(')
+//    {
+//      formatted += input.charAt(i);
+//      formatted += " ";
+//      //(-123
+//      if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
+//      {
+//        if (i + 2 < input.length() && (Character.isDigit(input.charAt(i + 2)) || input.charAt(i + 2) == '.'))
+//        {
+//          formatted += '~';
+//          formatted += " ";
+//          formatted += input.charAt(i+2);
+//          i++;
+//          i++;
+//          while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+//          {
+//            i++;
+//            formatted += input.charAt(i);
+//          }
+//          formatted+= " ";
+//        }
+//        else if(i+2 < input.length() && input.charAt(i+2) == '(')
+//        {
+//          formatted += '~';
+//          formatted += " ";
+//          i++;
+//        }
+//      }
+//    }
+//      //if right parenthesis add it to formated
+//    else if(input.charAt(i) == ')')
+//    {
+//      formatted += input.charAt(i);
+//      formatted += " ";
+//    }
+//      //if user enters x
+//    else if (input.charAt(i) == 'X' || input.charAt(i) == 'x')
+//      Term_Project.chooseMode();
+//    //throw error
+//  }
+//  return formatted;
+//}
 
 /**
  * This function implements the Shunting Yard algorithm.

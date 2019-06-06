@@ -31,6 +31,7 @@ bool GetInput(std::string &input, std::string &&question) {
  * @return
  */
 std::string CommaSeparator(const std::string &input) {
+  //todo, take fractions into account.
   std::string result;
   bool negative = false;
 

@@ -16,6 +16,11 @@ std::string Add(std::string op1, std::string op2) {
   bool fraction_op1 = false;
   bool fraction_op2 = false;
 
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
+
   /**
    * We need to determine whether the operands have fractions or not.
    */
@@ -103,6 +108,11 @@ std::string Add(std::string op1, std::string op2) {
 std::string Subtract(std::string op1, std::string op2) {
   // todo check for negatives
   bool negative = false;
+
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
 
   if (op1[0] == '-') { // op1 (-)
     if (op2[0] != '-') { // op1(-), op2 (+)
@@ -280,6 +290,11 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
 
   bool negative = false;
 
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
+
   if (op1[0] == '-') {
     negative = !negative;
     op1 = op1.substr(1);
@@ -424,8 +439,6 @@ std::string GCD(std::string op1, std::string op2) {
     b = remainder;
   }
   return a;
-<<<<<<< HEAD
-=======
 }
 
 /**
@@ -433,25 +446,32 @@ std::string GCD(std::string op1, std::string op2) {
  * @param op
  * @return
  */
-std::string Negate(std::string &op) {
+std::string Negate(const std::string &op) {
+
+  if (op.empty())
+    return "0";
 
   if (op[0] == '-')
     return op.substr(1);
   else
     return '-'+op;
->>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
 }
 
 /**
- * This function simplifies a given fraction to its most simplified form.
+ * This function simplifies a given fraction and returns its most simplified form. This function supports mixed
+ * numbers as well.
  * @param op
  * @return
  */
 std::string SimplifyFraction(std::string &op) {
-  // account for mixed numbers
+  // todo account for mixed numbers
+
+  if (op.empty())
+    return "0";
 
   std::string output = op;
   bool negative = false;
+
 
   if (output[0] == '-') {
     output = output.substr(1);
@@ -462,18 +482,32 @@ std::string SimplifyFraction(std::string &op) {
   while (output[0] == '0')
     output = output.substr(1);
 
-  std::string numerator, denominator;
+  std::string numerator, denominator, mixed = "";
   std::stringstream ss(output);
+  /** Check if operand is a mixed number **/
+  if (output.find(' ') != std::string::npos) {
+    ss >> mixed;
+    ss.get(); // Remove space
+  }
 
-  getline(ss, numerator, '/');
+  getline(ss, numerator, '/'); // Retrieve numerator & denominator
   ss >> denominator;
+
+  numerator = Add(numerator, Multiply(denominator, mixed)); // Add mixed, if applicable
 
   std::string divisor = GCD(numerator, denominator);
 
   numerator = Divide(numerator, divisor);
   denominator = Divide(denominator, divisor);
 
-  return numerator + ((denominator == "1") ? "" : "/"+denominator);
+  if (IsSmaller(denominator, numerator)) { // Convert improper fractions into mixed numbers. Takes negative int account.
+    return (negative) ? '-'+Divide(numerator, denominator) : Divide(numerator, denominator);
+  }
+
+  if (negative)
+    numerator.insert(0, "-");
+
+  return (numerator + ((denominator == "1") ? "" : "/"+denominator));
 }
 
 /**
