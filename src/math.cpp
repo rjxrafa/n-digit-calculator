@@ -254,15 +254,20 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string &op, const bool &&threaded){
+std::string Factorial(std::string &op, const bool &&threaded){ // todo : add threading operation
 
   if (op == "0")
     return "1";
 
-  if (op[0] == '-') {
-    printf("Invalid input! No negative numbers allowed.\n");
+  // Check for negatives and fractions
+  if (op[0] == '-' || op.find('/') != std::string::npos) {
+    printf("Invalid input!");
     return op;
   }
+
+  // Remove leading zeros
+  while (op[0] == 0)
+    op = op.substr(1);
 
   std::string factorial = "1",
               temp = "1",
@@ -463,7 +468,7 @@ std::string Negate(const std::string &op) {
  * @param op
  * @return
  */
-std::string SimplifyFraction(std::string &op) {
+std::string SimplifyFraction(const std::string &op) {
   // todo account for mixed numbers
 
   if (op.empty())

@@ -36,31 +36,32 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
 void help();
+bool REPL(map <int, string> &expressions);
 
 
 int main()
 {
-//  introduction();
-//  map<int, string> expressions;
-//  map<string, int> commands;
-//  string line;
-//  bool stored = false;
-//  loadCommands(commands);
-//  while(getLine(line))
-//    process(line, commands, expressions, stored);
-//  exit(line, expressions, stored);
-//  return 0;
+  introduction();
+  map<int, string> expressions;
+  map<string, int> commands;
+  string line;
+  bool stored = false;
+  loadCommands(commands);
+  while(getLine(line))
+    process(line, commands, expressions, stored);
+  exit(line, expressions, stored);
+  return 0;
 
-  while (1) {
-    std::string op1, op2, prod;
-    while (!GetInput(op1, "Enter operand 1: "));
-//    while (!GetInput(op2, "Enter operand 2: "));
-    prod = SimplifyFraction(op1);
-//    prod = Divide(op1, op2);
-    std::cout << prod << std::endl;
-//    std::cout << CommaSeparator(op1) << std::endl;
-//    std::cout << GCD(op1, op2);
-  }
+//  while (1) {
+//    std::string op1, op2, prod;
+//    while (!GetInput(op1, "Enter operand 1: "));
+////    while (!GetInput(op2, "Enter operand 2: "));
+//    prod = SimplifyFraction(op1);
+////    prod = Divide(op1, op2);
+//    std::cout << prod << std::endl;
+////    std::cout << CommaSeparator(op1) << std::endl;
+////    std::cout << GCD(op1, op2);
+//  }
 }
 
 void introduction()
@@ -81,18 +82,19 @@ bool getLine(string &line)
 
 void loadCommands(map<string, int> &commands)
 {
-  commands["LET"]  = 0;
-  commands["SHOW"] = 1;
-  commands["LIST"] = 2;
-  commands["HELP"] = 3;
-  commands["SAVE"] = 4;
-  commands["LOAD"] = 5;
-  commands["EDIT"]   = 6;
-  commands["EXIT"] = 7;
-  commands["QUIT"] = 7;
+  commands["LET"]   = 0;
+  commands["SHOW"]  = 1;
+  commands["LIST"]  = 2;
+  commands["HELP"]  = 3;
+  commands["SAVE"]  = 4;
+  commands["LOAD"]  = 5;
+  commands["EDIT"]  = 6;
+  commands["EXIT"]  = 7;
+  commands["QUIT"]  = 7;
   commands["WEXIT"] = 8;
   commands["WQUIT"] = 8;
   commands["CLEAR"] = 9;
+  commands["REPL"]  = 10;
 }
 
 /**
@@ -220,6 +222,11 @@ void executeCommand(const string &command, const string &suffix, const map<strin
       clear(expressions);
       break;
 
+    case 10:
+      while(REPL(expressions));
+      break;
+
+
     default: cout << "Invalid command!" << endl;
   }
 }
@@ -239,8 +246,6 @@ void let(const string& suffix, map<int, string>& expressions)
   vector<string> expression;
   char index;
   char temp;
-  int num(0);
-
 
   if (suffix.empty())
   {
@@ -628,7 +633,6 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
   map <char, int> op;
   loadPrecedence(op);
   bool unary = false;
-  int posA, posB;
 
   for (size_t i = 0; i < expression.size(); ++i)
   {
@@ -726,7 +730,6 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
  */
 string rpnEval(const string& postfix)
 {
-  int posA, posB;
   string operand;
   string result;
   vector<string> outputStack;
@@ -840,6 +843,40 @@ void help()
   cout << "[EXIT | QUIT]                              Exits the program!\n\n";
   cout << "[WEXIT <FILENAME> | WQUIT <FILENAME>]      Saves big num expression to a file and exits the program!\n\n";
   cout << "[LOAD <FILENAME>]                          Loads big num expressions from a given file!" << endl << endl;
+  printf("%s%37s%s", "[REPL]", "", "(EXPERIMENTAL) Turn on REPL mode.\n\n");
 
   cout << border << endl << endl;
+}
+
+/**
+ * This function allows for immediate evaluation of expressions.
+ * @param expressions
+ * @return
+ */
+bool REPL(map<int, string> &expressions) {
+
+  std::string input, postfix;
+
+  try {
+    if (!GetInput(input, ">> "))
+      return true;
+
+    if (input.empty()) {
+      printf("Exiting REPL mode.\n");
+      return false;
+    }
+
+    if (shuntingYard(input, postfix, expressions))
+      printf("=> %s\n", rpnEval(postfix).c_str());
+    else {
+      printf("\nError : Syntax Error\n");
+      return true;
+    }
+  }
+  catch (...) { // todo :: this doesnt seem to catch errors
+    printf("Error! Exiting REPL mode");
+    return false;
+  }
+
+  return true;
 }

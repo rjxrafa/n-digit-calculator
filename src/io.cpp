@@ -11,18 +11,17 @@
  */
 bool GetInput(std::string &input, std::string &&question) {
 
-  fflush(stdin);
-  printf("%s\n", question.c_str());
+  printf("%s", question.c_str());
   getline(std::cin, input);
+  fflush(stdin);
 
-  if (input.find_first_not_of("1234567890+- /") < input.size()) {
-    std::cout << "Invalid input! Please try again!\n";
+  if (input.find_first_not_of("^!1234567890*+- /") < input.size()) {
+    printf("Invalid input!\n");
     return false;
   } else {
+      // todo
     return true;
   }
-
-
 }
 
 /**
