@@ -34,10 +34,12 @@ std::string CommaSeparator(const std::string &input) {
   std::string result;
   bool negative = false;
 
+  //if negative set negative to true
   if (input[0] == '-')
     negative = true;
 
   unsigned int count = 0;
+  //add comma every three spaces
   for (auto i = input.rbegin(); i != input.rend(); ++i, ++count) {
     if ((count % 3) == 0)
       result = ',' + result;
@@ -45,12 +47,15 @@ std::string CommaSeparator(const std::string &input) {
     result = (*i + result);
   }
 
+  //removes leading zeroes
   while (result[0] == ',' || result[0] == '0' || result[0] == '-')
     result.erase(0,1);
 
+  //removes trailing comma
   if (result[result.size()-1] == ',')
     result.erase(result.size()-1);
 
+  //adds negative
   if (negative)
     result.insert(result.begin(), '-');
 

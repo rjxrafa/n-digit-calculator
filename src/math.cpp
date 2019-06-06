@@ -236,7 +236,6 @@ std::string Multiply(std::string op1, std::string op2) {
   std::reverse(op2.begin(), op2.end());
 
   return product.empty() ? "0" : product;
-
 }
 
 /**
@@ -369,9 +368,7 @@ std::string Power(std::string op1, std::string op2) {
     op2 = Subtract(op2, "1");
     result = Multiply(result, op1);
   }
-
   return result;
-
 }
 
 void GenerateDivisors(std::vector<std::string> &v, const std::string &num) {
@@ -386,6 +383,7 @@ void GenerateDivisors(std::vector<std::string> &v, const std::string &num) {
     it = Add(it, "1");
   }
 }
+
 /**
  * This function calculates the GCD for two given operands. This implementation uses the Euclidian algorithm for
  * finding GCD between two numbers.
@@ -426,6 +424,8 @@ std::string GCD(std::string op1, std::string op2) {
     b = remainder;
   }
   return a;
+<<<<<<< HEAD
+=======
 }
 
 /**
@@ -439,6 +439,7 @@ std::string Negate(std::string &op) {
     return op.substr(1);
   else
     return '-'+op;
+>>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
 }
 
 /**

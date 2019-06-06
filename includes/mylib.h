@@ -10,6 +10,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
+#include <map>
+#include <sstream>
 #include <cmath>
 #include <sstream>
 
