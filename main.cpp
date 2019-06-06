@@ -7,10 +7,14 @@ int main() {
 
   while (1) {
     while (!GetInput(op1, "Enter operand 1: "));
-    while (!GetInput(op2, "Enter operand 2: "));
+//    while (!GetInput(op2, "Enter operand 2: "));
 
+
+//    prod = GCD(op1, op2);
+//    prod = Factorial(op1);
+//    std::cout << prod << std::endl;
     std::cout << CommaSeparator(Factorial(op1)) << std::endl;
-    std::cout << GCD(op1,op2);
+//    std::cout << GCD(op1,op2);
   }
 
   return 0;

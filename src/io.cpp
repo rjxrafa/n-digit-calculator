@@ -15,7 +15,7 @@ bool GetInput(std::string &input, std::string &&question) {
   printf("%s\n", question.c_str());
   getline(std::cin, input);
 
-  if (input.find_first_not_of("1234567890+-") < input.size()) {
+  if (input.find_first_not_of("1234567890+- /") < input.size()) {
     std::cout << "Invalid input! Please try again!\n";
     return false;
   } else {

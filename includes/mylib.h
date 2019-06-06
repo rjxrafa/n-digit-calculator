@@ -11,5 +11,6 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 
 #endif //N_DIGIT_CALCULATOR__MYLIB_H_

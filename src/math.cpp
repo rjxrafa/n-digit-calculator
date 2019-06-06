@@ -16,10 +16,24 @@ std::string Add(std::string op1, std::string op2) {
   bool fraction_op1 = false;
   bool fraction_op2 = false;
 
-  if (op1.find('/') == std::string::npos)
+  /**
+   * We need to determine whether the operands have fractions or not.
+   */
+  std::string op1_whole, op1_fraction;
+  std::stringstream ss(op1);
+
+  ss >> op1_whole >> op1_fraction;
+
+  ss.clear();
+  ss.str(op2);
+  std::string op2_whole, op2_fraction;
+  ss >> op2_whole >> op2_fraction;
+
+
+  if (op1_whole.find('/') != std::string::npos)
     fraction_op1 = true;
 
-  if (op1.find('/') < std::string::npos)
+  if (op1.find('/') != std::string::npos)
     fraction_op2 = true;
 
   if (op1[0] == '-') {
@@ -254,7 +268,7 @@ std::string Factorial(std::string &op, const bool &&threaded){
 }
 
 /**
- * This function performs division between two operands. This function uses the restoring diviison algorithm
+ * This function performs division between two operands. This function uses the restoring division algorithm
  * which can be found here:
  *  https://web.stanford.edu/class/ee486/doc/chap5.pdf
  *
@@ -413,6 +427,12 @@ std::string GCD(std::string op1, std::string op2) {
   }
   return a;
 }
+
+/**
+ * This function negates a given operand.
+ * @param op
+ * @return
+ */
 std::string Negate(std::string &op) {
 
   if (op[0] == '-')
@@ -421,3 +441,45 @@ std::string Negate(std::string &op) {
     return '-'+op;
 }
 
+/**
+ * This function simplifies a given fraction to its most simplified form.
+ * @param op
+ * @return
+ */
+std::string SimplifyFraction(std::string &op) {
+  // account for mixed numbers
+
+  std::string output = op;
+  bool negative = false;
+
+  if (output[0] == '-') {
+    output = output.substr(1);
+    negative = true;
+  }
+
+  /** Removing leading zeroes. **/
+  while (output[0] == '0')
+    output = output.substr(1);
+
+  std::string numerator, denominator;
+  std::stringstream ss(output);
+
+  getline(ss, numerator, '/');
+  ss >> denominator;
+
+  std::string divisor = GCD(numerator, denominator);
+
+  numerator = Divide(numerator, divisor);
+  denominator = Divide(denominator, divisor);
+
+  return numerator + ((denominator == "1") ? "" : "/"+denominator);
+}
+
+/**
+ * This function will "normalize" the denominators of the given fraction to allow for operations on the numerator.
+ * @param op1
+ * @param op2
+ */
+void NormalizeFractions(std::string &op1, std::string &op2) {
+
+}
