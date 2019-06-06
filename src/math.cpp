@@ -266,7 +266,7 @@ std::string Factorial(std::string &op, const bool &&threaded){ // todo : add thr
   }
 
   // Remove leading zeros
-  while (op[0] == 0)
+  while (op[0] == '0')
     op = op.substr(1);
 
   std::string factorial = "1",
