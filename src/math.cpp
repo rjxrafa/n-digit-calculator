@@ -1,7 +1,3 @@
-//
-// Created by rafab on 5/29/2019.
-//
-
 #include "../includes/math.h"
 
 /**
@@ -410,15 +406,13 @@ std::string GCD(std::string op1, std::string op2) {
     b = remainder;
   }
   return a;
-<<<<<<< HEAD
-=======
+
 }
-std::string Negate(std::string &op) {
+std::string Negate(std::string op) {
 
   if (op[0] == '-')
     return op.substr(1);
   else
     return '-'+op;
->>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
 }
 

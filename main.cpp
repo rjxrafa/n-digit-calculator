@@ -9,7 +9,7 @@
 #include "includes/io.h"
 #include "includes/mylib.h"
 #include "includes/math.h"
-
+#include "test_functions.h"
 using namespace std;
 
 void introduction();
@@ -24,7 +24,7 @@ void executeCommand(const string &command, const string &suffix,
                     const map<string, int> &commands,
                     map<int, string>& expressions, bool &stored);
 
-
+//string formatInfix(string infix);
 void let(const string& suffix, map<int, string>& expressions);
 void edit(const string& suffix, map<int, string>& expressions);
 void show(const string& suffix, map<int, string> expressions);
@@ -39,10 +39,10 @@ string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
 void help();
 
-
-<<<<<<< HEAD
 int main()
 {
+
+//    test_format();
     introduction();
     map<int, string> expressions;
     map<string, int> commands;
@@ -53,13 +53,6 @@ int main()
         process(line, commands, expressions, stored);
     exit(line, expressions, stored);
     return 0;
-=======
-    std::cout << CommaSeparator(Factorial(op1)) << std::endl;
-    std::cout << GCD(op1,op2);
-  }
->>>>>>> 04952e2a0b64cbb6a0a531b4ee99422406c113b6
-
-  return 0;
 }
 
 void introduction()
@@ -247,7 +240,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*=+!-/") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*=+!()-/") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
@@ -518,81 +511,90 @@ void load(const string &suffix, map<int, string>& expressions)
     in.close();
 }
 
-string formatInfix(string& infix)
+string formatInfix(string input)
 {
     //removes all whitespaces
-   input = input.replaceAll("\\s+", "");
-   String formatted = "";
-   boolean negative_start = false;
+   string formatted = "";
+   bool negative_start = false;
 
    for (int i = 0; i < input.length(); ++i)
    {
        //negative check
-       if(input.charAt(0) == '-' && !negative_start)
+       if(input[0] == '-' && !negative_start)
        {
            negative_start = true;
            formatted += '~';
            formatted += " ";
-           while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+           while (i + 1 < input.length() && isdigit(input[i+1]) || input[i+1] == '.')
            {
                i++;
-               formatted += input.charAt(i);
+               formatted += input[i];
            }
+
            formatted += " ";
        }
+
        //EX. formatting 123.123
-       else if (Character.isDigit(input.charAt(i)))
+       else if (isdigit(input[i]))
        {
-           formatted += input.charAt(i);
-           while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+           formatted += input[i];
+           while (i + 1 < input.length() && (isdigit(input[i+1]) || input[i+1] == '.'))
            {
                i++;
-               formatted += input.charAt(i);
+               formatted += input[i];
            }
            formatted += " ";
        }
+
        //+123.23
-       else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
+       else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/')
        {
-           formatted += input.charAt(i);
+           formatted += input[i];
            formatted += " ";
            //negative check
-           if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
+           if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
            {
+               if(input[i+1] == '-')
+               {
+                  formatted += '~';
+                  formatted += " ";
+               }
                i++;
-               formatted += '~';
-               formatted += " ";
-               while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+               while (i + 1 < input.length() && (isdigit(input[i+1]) || input[i+1] == '.'))
                {
                    i++;
-                   formatted += input.charAt(i);
+                   formatted += input[i];
                }
                formatted += " ";
            }
        }
+
        //if left parenthesis, check for negatives after
-       else if( input.charAt(i) == '(')
+       else if( input[i] == '(')
        {
-           formatted += input.charAt(i);
+           formatted += input[i];
            formatted += " ";
            //(-123
-           if(i + 1 < input.length() && ((input.charAt(i+1) == '-') || (input.charAt(i+1) == '+')))
+           if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
            {
-               if (i + 2 < input.length() && (Character.isDigit(input.charAt(i + 2)) || input.charAt(i + 2) == '.'))
+               if (i + 2 < input.length() && isdigit(input[i+2]) || input[i+2] == '.')
                {
-                   formatted += '~';
-                   formatted += " ";
-                   formatted += input.charAt(i+2);
+                   if(input[i+1] == '-')
+                   {
+                       formatted += '~';
+                       formatted += " ";
+                   }
+                   formatted += input[i+2];
                    i++;
                    i++;
-                   while (i + 1 < input.length() && (Character.isDigit(input.charAt(i + 1)) || input.charAt(i + 1) == '.'))
+                   while (i + 1 < input.length() && (isdigit(input[i+1]) || input[i+1] == '.'))
                    {
                        i++;
-                       formatted += input.charAt(i);
+                       formatted += input[i];
                    }
                    formatted+= " ";
                }
-               else if(i+2 < input.length() && input.charAt(i+2) == '(')
+               else if(i+2 < input.length() && input[i+2] == '(')
                {
                    formatted += '~';
                    formatted += " ";
@@ -601,14 +603,16 @@ string formatInfix(string& infix)
            }
        }
        //if right parenthesis add it to formated
-       else if(input.charAt(i) == ')')
+       else if(input[i] == ')')
        {
-           formatted += input.charAt(i);
+           formatted += input[i];
            formatted += " ";
        }
-       //if user enters x
-       else if (input.charAt(i) == 'X' || input.charAt(i) == 'x')
-           Term_Project.chooseMode();
+       else if(input[i] == '!')
+       {
+           formatted += input[i];
+           formatted += " ";
+       }
        //throw error
    }
    return formatted;
@@ -621,9 +625,11 @@ string formatInfix(string& infix)
  */
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions)
 {
+    expression = formatInfix(expression);
     bool debug = false;
-    string outputQueue;
-    string operatorStack;
+    string outputQueue = "";
+    postfix = "";
+    string operatorStack = "";
     map <char, int> op;
     loadPrecedence(op);
     bool unary = false;
@@ -661,18 +667,19 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
 
         else if (op.count(expression[i]))
         {
-            if(operatorStack.back() == '~')
+            if(expression[i] == '~' || expression[i] == '!')
             {
                 operatorStack.push_back(expression[i]);
                 continue;
             }
-            
+
             // stack can't be empty AND top of stack cant be left parent AND token has to be greater
             // in precedence to top of stack
             while (!operatorStack.empty() && (operatorStack.back() != '(') &&
-                   op.at(operatorStack.back()) <= op.at(expression[i]))
+                   op.at(operatorStack.back()) >= op.at(expression[i]))
             {
-                outputQueue.push_back(operatorStack.back());
+                outputQueue += operatorStack.back();
+                outputQueue += " ";
                 operatorStack.pop_back();
             }
             operatorStack.push_back(expression[i]);
@@ -685,7 +692,8 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
 
         else if (expression[i] == ')') {
             while (!operatorStack.empty() && operatorStack.back() != '(') {
-                outputQueue.push_back(operatorStack.back());
+                outputQueue += operatorStack.back();
+                outputQueue += " ";
                 operatorStack.pop_back();
             }
             if(operatorStack.size() == 0)
@@ -710,6 +718,7 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         if(operatorStack[i] == '(')
             return false;
         outputQueue += operatorStack[i];
+        outputQueue += " ";
     }
 
     postfix = outputQueue;
@@ -755,12 +764,12 @@ string rpnEval(const string& postfix)
                     result = Factorial(first);
                     outputStack.push_back(result);
                     break;
-//                case '~':
-//                    first = outputStack.back();
-//                    outputStack.pop_back();
-//                    result = Negate(first);
-//                    outputStack.push_back(result);
-//                    break;
+                case '~':
+                    first = outputStack.back();
+                    outputStack.pop_back();
+                    result = Negate(first);
+                    outputStack.push_back(result);
+                    break;
                 case '+':
                     first = outputStack.back();
                     outputStack.pop_back();

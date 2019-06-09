@@ -13,5 +13,6 @@
 #include <map>
 #include <sstream>
 #include <cmath>
+#include <string>
 
 #endif //N_DIGIT_CALCULATOR__MYLIB_H_
