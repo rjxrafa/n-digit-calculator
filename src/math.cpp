@@ -400,7 +400,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (IsSmaller(op1, op2)) {
     if (negative)
       op1 = '-'+op1;
-    return op1 + "/"+ op2;
+    return op1 + "|"+ op2;
   } else {
 
     /**
@@ -434,7 +434,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
       quotient = quotient.substr(1);
 
     if (remainder != "0")
-      quotient.append(' '+remainder+'/'+op2);
+      quotient.append('_'+remainder+'|'+op2);
 
     if (mod)
       return remainder;
