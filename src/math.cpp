@@ -1,7 +1,3 @@
-//
-// Created by rafab on 5/29/2019.
-//
-
 #include "../includes/math.h"
 
 /**
