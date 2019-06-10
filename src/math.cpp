@@ -814,3 +814,39 @@ std::string Combination(std::string op1, std::string op2) {
 
   return SimplifyFraction(numerator+"|"+denominator);
 }
+
+std::string Permutation(std::string op1, std::string op2) {
+
+  if (op1.find('-') != std::string::npos ||
+      op1.find('|') != std::string::npos ||
+      op1.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  if (op2.find('-') != std::string::npos ||
+      op2.find('|') != std::string::npos ||
+      op2.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  // Remove leading zeros
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (IsSmaller(op1, op2)) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  std::string numerator,
+      denominator;
+
+  numerator = (Factorial(op1));
+  denominator = (Factorial(Subtract(op1, op2)));
+
+  return SimplifyFraction(numerator+"|"+denominator);
+}
