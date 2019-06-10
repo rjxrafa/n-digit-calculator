@@ -44,7 +44,7 @@ int main()
 
 
 //    test_format();
-    map<int, string> expressions;
+//    map<int, string> expressions;
 
 //    introduction();
 //    while(1)
@@ -52,14 +52,24 @@ int main()
 //        map<int, string> expressions;
 //        REPL(expressions);
 //    }
-    map<string, int> commands;
-    string line;
-    bool stored = false;
-    loadCommands(commands);
-    while(getLine(line))
-        process(line, commands, expressions, stored);
-    exit(line, expressions, stored);
-    return 0;
+//    map<string, int> commands;
+//    string line;
+//    bool stored = false;
+//    loadCommands(commands);
+//    while(getLine(line))
+//        process(line, commands, expressions, stored);
+//    exit(line, expressions, stored);
+//    return 0;
+    while (1) {
+    std::string op1, op2;
+    while (!GetInput(op1, "op1: "));
+    while (!GetInput(op2, "op2: "));
+
+    std::cout << Add(op1,op2) << std::endl;
+//    NormalizeFractions(op1, op2);
+//    std::cout << "op1: " << op1 << std::endl;
+//    std::cout << "op2: " << op2 << std::endl;
+    }
 }
 
 void introduction()
@@ -80,18 +90,19 @@ bool getLine(string &line)
 
 void loadCommands(map<string, int> &commands)
 {
-    commands["LET"]  = 0;
-    commands["SHOW"] = 1;
-    commands["LIST"] = 2;
-    commands["HELP"] = 3;
-    commands["SAVE"] = 4;
-    commands["LOAD"] = 5;
-    commands["EDIT"]   = 6;
-    commands["EXIT"] = 7;
-    commands["QUIT"] = 7;
+    commands["LET"]   = 0;
+    commands["SHOW"]  = 1;
+    commands["LIST"]  = 2;
+    commands["HELP"]  = 3;
+    commands["SAVE"]  = 4;
+    commands["LOAD"]  = 5;
+    commands["EDIT"]  = 6;
+    commands["EXIT"]  = 7;
+    commands["QUIT"]  = 7;
     commands["WEXIT"] = 8;
     commands["WQUIT"] = 8;
     commands["CLEAR"] = 9;
+    commands["REPL"]  = 10;
 }
 
 /**
@@ -112,7 +123,7 @@ void trimLineAndStandardize(string &line)
     while((pos = line.find(' ', ++pos)) < line.size())
         while(line[pos+1] == ' ')
             line.erase(pos+1,1);
-    while((pos = line.find('\t ', ++pos)) < line.size())
+    while((pos = line.find('\t', ++pos)) < line.size())
         while(line[pos+1] == '\t')
             line.erase(pos+1,1);
     //modifies input so all chars are uppercase
@@ -282,6 +293,9 @@ void executeCommand(const string &command, const string &suffix, const map<strin
             break;
         case 9:
             clear(expressions);
+            break;
+        case 10:
+            while (REPL(expressions));
             break;
 
         default: cout << "Invalid command!" << endl;
@@ -943,7 +957,6 @@ void help()
 bool REPL(map<int, string> &expressions) {
 
   std::string input, postfix;
-
   try {
     if (!GetInput(input, ">> "))
       return true;
