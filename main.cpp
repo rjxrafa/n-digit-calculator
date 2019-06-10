@@ -46,15 +46,19 @@ bool REPL(map<int, string> &expressions);
 int main()
 {
 //    test_format();
-    map<int, string> expressions;
-    introduction();
-    map<string, int> commands;
-    string line;
-    bool stored = false;
-    loadCommands(commands);
-    while(getLine(line))
-        process(line, commands, expressions, stored);
-    exit(line, expressions, stored);
+//    map<int, string> expressions;
+//    introduction();
+//    map<string, int> commands;
+//    string line;
+//    bool stored = false;
+//    loadCommands(commands);
+//    while(getLine(line))
+//        process(line, commands, expressions, stored);
+//    exit(line, expressions, stored);
+
+    std::string op1 = "2_2|3";
+    std::string op2 = "2";
+    std::cout << Add(op1,op2);
     return 0;
 }
 

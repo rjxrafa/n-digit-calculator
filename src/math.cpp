@@ -13,7 +13,7 @@ std::string Add(std::string op1, std::string op2) {
        negative = false;
 
   /** This submethod turns all operands to their equivalent fraction. **/
-  if (op1.find('/') != std::string::npos || op2.find('/') != std::string::npos) {
+  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
     fraction = true;
     NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
   }
@@ -133,7 +133,7 @@ std::string Subtract(std::string op1, std::string op2) {
       negative = false;
 
   /** This submethod turns all operands to their equivalent fraction. **/
-  if (op1.find('/') != std::string::npos || op2.find('/') != std::string::npos) {
+  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
     fraction = true;
     NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
   }
@@ -568,8 +568,8 @@ std::string SimplifyFraction(const std::string &op) {
   }
 
   /** Check if operand is a fraction **/
-  if (output.find('/') != std::string::npos) {
-    getline(ss, numerator, '/'); // Retrieve numerator & denominator
+  if (output.find('|') != std::string::npos) {
+    getline(ss, numerator, '|'); // Retrieve numerator & denominator
     ss >> denominator;
   } else if (!mixed.empty()){
     return mixed;
@@ -590,7 +590,7 @@ std::string SimplifyFraction(const std::string &op) {
   if (negative)
     numerator.insert(0, "-");
 
-  return (numerator + ((denominator == "1") ? "" : "/"+denominator));
+  return (numerator + ((denominator == "1") ? "" : "|"+denominator));
 }
 
 /**
@@ -627,7 +627,7 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
               op1_denominator;
   std::stringstream ss(op1);
 
-  if (op1.find('/') == std::string::npos) { // Case 1: Op1 is not a fraction/mixed number
+  if (op1.find('|') == std::string::npos) { // Case 1: Op1 is not a fraction/mixed number
     if (op1.empty() || op1 == "0") { // Case 1.1: Op1 is zero/empty
       op1_numerator = "0";
     } else // Case 1.2: Op1 is a whole number
@@ -637,7 +637,7 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
     if (op1.find('_') != std::string::npos) { // Case 2.1: op1 is a mixed number
       getline(ss, op1_mixed, '_');
     }
-    getline(ss, op1_numerator, '/');
+    getline(ss, op1_numerator, '|');
     getline(ss, op1_denominator);
 
     if (!op1_mixed.empty()) {
@@ -651,7 +651,7 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
               op2_denominator;
   ss.clear(); ss.str(op2);
 
-  if (op2.find('/') == std::string::npos) { // Case 1: Op1 is not a fraction/mixed number
+  if (op2.find('|') == std::string::npos) { // Case 1: Op1 is not a fraction/mixed number
     if (op2.empty() || op2 == "0") { // Case 1.1: Op1 is zero/empty
       op2_numerator = "0";
     } else // Case 1.2: Op1 is a whole number
@@ -661,7 +661,7 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
     if (op2.find('_') != std::string::npos) { // Case 2.1: op2 is a mixed number
       getline(ss, op2_mixed, '_');
     }
-    getline(ss, op2_numerator, '/');
+    getline(ss, op2_numerator, '|');
     getline(ss, op2_denominator);
 
     if (!op2_mixed.empty()) {
@@ -670,7 +670,7 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
   }
 
   op1 = ((op1_is_negative) ? "-" : "") +
-        Multiply(op1_numerator, op2_denominator) + "/" + Multiply(op1_denominator, op2_denominator);
+        Multiply(op1_numerator, op2_denominator) + "|" + Multiply(op1_denominator, op2_denominator);
   op2 = ((op2_is_negative) ? "-" : "") +
-        Multiply(op2_numerator, op1_denominator) + "/" + Multiply(op2_denominator, op1_denominator);
+        Multiply(op2_numerator, op1_denominator) + "|" + Multiply(op2_denominator, op1_denominator);
 }
