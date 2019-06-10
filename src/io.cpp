@@ -11,6 +11,7 @@
  */
 bool GetInput(std::string &input, std::string &&question) {
 
+  fflush(stdin);
   printf("%s", question.c_str());
   getline(std::cin, input);
   fflush(stdin);

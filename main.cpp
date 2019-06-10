@@ -41,27 +41,27 @@ bool REPL(map <int, string> &expressions);
 
 int main()
 {
-  introduction();
-  map<int, string> expressions;
-  map<string, int> commands;
-  string line;
-  bool stored = false;
-  loadCommands(commands);
-  while(getLine(line))
-    process(line, commands, expressions, stored);
-  exit(line, expressions, stored);
-  return 0;
+//  introduction();
+//  map<int, string> expressions;
+//  map<string, int> commands;
+//  string line;
+//  bool stored = false;
+//  loadCommands(commands);
+//  while(getLine(line))
+//    process(line, commands, expressions, stored);
+//  exit(line, expressions, stored);
+//  return 0;
 
-//  while (1) {
-//    std::string op1, op2, prod;
-//    while (!GetInput(op1, "Enter operand 1: "));
-////    while (!GetInput(op2, "Enter operand 2: "));
-//    prod = SimplifyFraction(op1);
-////    prod = Divide(op1, op2);
-//    std::cout << prod << std::endl;
-////    std::cout << CommaSeparator(op1) << std::endl;
-////    std::cout << GCD(op1, op2);
-//  }
+  while (1) {
+    std::string op1, op2, prod;
+    while (!GetInput(op1, "Enter operand 1: "));
+    while (!GetInput(op2, "Enter operand 2: "));
+
+    std::cout << Add(op1, op2);
+//
+//    std::cout << op1 << std::endl;
+//    std::cout << op2 << std::endl;
+  }
 }
 
 void introduction()
