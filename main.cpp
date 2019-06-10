@@ -56,10 +56,12 @@ int main()
 //    while(getLine(line))
 //        process(line, commands, expressions, stored);
 //    exit(line, expressions, stored);
-
-    std::string op1 = "2_2|3";
-    std::string op2 = "2";
-    std::cout << Add(op1,op2);
+while(1)
+{    std::string op1 = "22";
+    std::string op2 = "3";
+    while(!GetInput(op1, "op1: "));
+    while(!GetInput(op2, "op2: "));
+    std::cout << Add(op1,op2) << std::endl;}
     return 0;
 }
 

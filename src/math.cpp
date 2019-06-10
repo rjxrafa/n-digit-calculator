@@ -39,9 +39,9 @@ std::string Add(std::string op1, std::string op2) {
     if (op2.empty())
       return "0";
     else
-      return op2;
+      return SimplifyFraction(op2);
   } else if (op2.empty()) {
-    return op1;
+    return SimplifyFraction(op1);
   }
 
   /** This submethod turns all operands to their equivalent fraction. **/
@@ -115,9 +115,9 @@ std::string Add(std::string op1, std::string op2) {
 
   if (fraction) {
     sum = sum + "|" + common_denominator;
-//    sum = SimplifyFraction(sum);
   }
 
+  sum = SimplifyFraction(sum);
   return sum;
 }
 
@@ -159,9 +159,12 @@ std::string Subtract(std::string op1, std::string op2) {
   if (op1.empty()) { // This routine will check for empty strings or 0
     if (op2.empty())
       return "0";
-    else
+    else {
+      op2 = SimplifyFraction(op2);
       return (negative) ? op2 : ('-'+op2);
+    }
   } else if (op2.empty()) {
+    op1 = SimplifyFraction(op1);
     return op1;
   }
 
@@ -230,8 +233,8 @@ std::string Subtract(std::string op1, std::string op2) {
       return "0";
     else
       diff = diff + "|" + common_denominator;
-//    diff = SimplifyFraction(diff);
   }
+  diff = SimplifyFraction(diff);
 
   return diff.empty() ? "0" : ((negative) ? ('-'+diff) : (diff));
 }
@@ -280,10 +283,13 @@ std::string Multiply(std::string op1, std::string op2) {
     op2 = op2.substr(1);
   }
 
-  if (op1 == "1") // Identity Property
+  if (op1 == "1") { // Identity Property
+    op2 = SimplifyFraction(op2);
     return ((negative) ? "-":"") + op2;
-  else if (op2 == "1")
+  } else if (op2 == "1") {
+    op2 = SimplifyFraction(op2);
     return ((negative) ? "-":"") + op1;
+  }
 
   /** Handle zeroes **/
   while (op1[0] == '0') {
@@ -370,7 +376,7 @@ std::string Multiply(std::string op1, std::string op2) {
 
   if (fraction) {
     product = product + "|" + common_denominator;
-//    product = SimplifyFraction(product);
+    product = SimplifyFraction(product);
   }
 
   return product.empty() ? "0" : product;
@@ -642,39 +648,36 @@ std::string Negate(const std::string &op) {
  * @param op
  * @return
  */
-std::string SimplifyFraction(const std::string &op) {
+std::string SimplifyFraction(std::string op) {
 
-  std::string output = op;
+  if (op.find('|') == std::string::npos) // If op is not a fraction, return op
+    return op;
+
+  bool negative = false;
+  /** Handle negatives **/
+  if (op[0] == '-') {
+    op = op.substr(1);
+    negative = true;
+  }
+
   /** Removing leading zeroes. **/
-  while (output[0] == '0')
-    output = output.substr(1);
+  while (op[0] == '0')
+    op = op.substr(1);
 
   if (op.empty())
     return "0";
 
-  bool negative = false;
-
-  if (output[0] == '-') {
-    output = output.substr(1);
-    negative = true;
-  }
-
   std::string numerator, denominator, mixed;
-  std::stringstream ss(output);
+  std::stringstream ss(op);
 
   /** Check if operand is a mixed number **/
-  if (output.find('_') != std::string::npos) {
+  if (op.find('_') != std::string::npos) {
     ss >> mixed;
     ss.get(); // Remove space
   }
 
-  /** Check if operand is a fraction **/
-  if (output.find('|') != std::string::npos) {
-    getline(ss, numerator, '|'); // Retrieve numerator & denominator
-    ss >> denominator;
-  } else if (!mixed.empty()){
-    return mixed;
-  }
+  getline(ss, numerator, '|'); // Retrieve numerator & denominator
+  ss >> denominator;
 
   numerator = Add(numerator, Multiply(denominator, mixed)); // Add mixed, if applicable
 
