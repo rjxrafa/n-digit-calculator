@@ -17,6 +17,11 @@ bool IsSmaller(const std::string &op1, const std::string &op2);
 bool IsPrime();
 void GenerateDivisors(std::vector<std::string> &v, const std::string &num);
 std::string GCD(std::string op1, std::string op2);
-std::string Negate(std::string op);
+std::string Negate(const std::string &op);
+std::string SimplifyFraction(const std::string &op);
+void NormalizeFractions(std::string &op1, std::string &op2);
+std::string FractionToDecimal(const std::string &op1);
+std::string SquareRoot(const std::string &op);
+
 
 #endif //N_DIGIT_CALCULATOR_SRC_ADD_H_

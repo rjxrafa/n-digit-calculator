@@ -9,7 +9,6 @@
 #include "includes/io.h"
 #include "includes/mylib.h"
 #include "includes/math.h"
-#include "test_functions.h"
 using namespace std;
 
 void introduction();
@@ -38,13 +37,21 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
 void help();
+bool REPL(map<int, string> &expressions);
 
 int main()
 {
 
+
 //    test_format();
-    introduction();
     map<int, string> expressions;
+
+//    introduction();
+//    while(1)
+//    {
+//        map<int, string> expressions;
+//        REPL(expressions);
+//    }
     map<string, int> commands;
     string line;
     bool stored = false;
@@ -120,6 +127,9 @@ void trimLineAndStandardize(string &line)
 void purgeSpaces(string &line)
 {
     std::string temp = "";
+    string formatted = "";
+    bool validMixed = false;
+    int j = 0;
     for (unsigned int i = 0; i < line.length(); ++i)
     {
         //skip tabs
@@ -127,11 +137,73 @@ void purgeSpaces(string &line)
         {
             continue;
         }
-        if ((line[i] != ' ')) {
-            temp += toupper(line[i]);
+        //handle mixed here
+        //if digit
+        if ((isdigit(line[i])))
+        {
+            formatted += line[i];
+            //continues accepting numbers
+            while (i + 1 < line.length() && isdigit(line[i+1]))
+            {
+                i++;
+                formatted += line[i];
+            }
+            //possible fraction
+            if(i+1 < line.length() && line[i+1] == '/')
+            {
+                j = i+1;
+
+            }
+            //possible mixed number
+            else if(i+1 < line.length() && line[i+1] == ' ')
+            {
+                //skip that white space
+                i++;
+
+                //skip remaining white spaces
+                while(i+1 < line.length() && line[i+1] == ' ')
+                    i++;
+
+                j = i;
+                //check if mixed number
+                if(j+1 < line.length() && isdigit(line[j+1]))
+                {
+                    temp += ' ';
+                    //keep taking digits
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
+                    //if fraction
+                    if(j+1 < line.length() && line[j+1] == '/')
+                    {
+                        temp += '|';
+                        j++;
+                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        {
+                            validMixed = true;
+                            j++;
+                            temp += line[j];
+                        }
+                        if(validMixed)
+                        {
+                            i = j;
+                            formatted += temp;
+                        }
+                    }
+                }
+                else
+                    continue;
+
+            }
+        }
+        else if(line[i] != ' ')
+        {
+            formatted += line[i];
         }
     }
-    line = temp;
+    line = formatted;
 }
 
 /**
@@ -240,7 +312,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*=+!()-/") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*=+!()-/ ") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
@@ -271,7 +343,7 @@ void let(const string& suffix, map<int, string>& expressions)
 //            {
 //                return;
 //            }
-            expressions[int(index) - 65] = rpnEval(postfix);
+//            expressions[int(index) - 65] = rpnEval(postfix);
         }
         return;
     }
@@ -514,31 +586,42 @@ void load(const string &suffix, map<int, string>& expressions)
 string formatInfix(string input)
 {
     //removes all whitespaces
-   string formatted = "";
-   bool negative_start = false;
+//   string formatted = "";
+       bool negative_start = false;
 
-   for (int i = 0; i < input.length(); ++i)
+   for(int i = 0; i < input.length(); ++i)
    {
-       //negative check
-       if(input[0] == '-' && !negative_start)
+       if(isdigit(input[i]))
        {
-           negative_start = true;
-           formatted += '~';
-           formatted += " ";
-           while (i + 1 < input.length() && isdigit(input[i+1]) || input[i+1] == '.')
+           while (i + 1 < input.length() && isdigit(input[i+1]))
            {
-               i++;
-               formatted += input[i];
-           }
 
-           formatted += " ";
+           }
        }
+   }
+
+//   for (int i = 0; i < input.length(); ++i)
+//   {
+       //negative check
+//       if(input[0] == '-' && !negative_start)
+//       {
+//           negative_start = true;
+//           formatted += '~';
+//           formatted += " ";
+//           while (i + 1 < input.length() && isdigit(input[i+1]) || input[i+1] == '.')
+//           {
+//               i++;
+//               formatted += input[i];
+//           }
+
+//           formatted += " ";
+//       }
 
        //EX. formatting 123.123
-       else if (isdigit(input[i]))
+       /*else *//*if (isdigit(input[i]))
        {
            formatted += input[i];
-           while (i + 1 < input.length() && (isdigit(input[i+1]) || input[i+1] == '.'))
+           while (i + 1 < input.length() && (isdigit(input[i+1]) || input[i+1] == ' '))
            {
                i++;
                formatted += input[i];
@@ -615,7 +698,7 @@ string formatInfix(string input)
        }
        //throw error
    }
-   return formatted;
+   return formatted;*/
 }
 
 /**
@@ -625,7 +708,8 @@ string formatInfix(string input)
  */
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions)
 {
-    expression = formatInfix(expression);
+//    expression = formatInfix(expression);
+//    cout << expression << endl;
     bool debug = false;
     string outputQueue = "";
     postfix = "";
@@ -633,7 +717,7 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
     map <char, int> op;
     loadPrecedence(op);
     bool unary = false;
-    int posA, posB;
+    int posA, posB, posF;
 
     for (size_t i = 0; i < expression.size(); ++i)
     {
@@ -644,7 +728,8 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         {
             string numbers = "", set;
             numbers += expression[i];
-            while(i < expression.size() && isdigit(expression[i+1]))
+            while(i < expression.size() && (isdigit(expression[i+1]) || isspace(expression[i+1])
+                                            || expression[i+1] == '|'))
             {
                 numbers+= expression[i+1];
                 i++;
@@ -669,14 +754,15 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         {
             if(expression[i] == '~' || expression[i] == '!')
             {
-                operatorStack.push_back(expression[i]);
+                outputQueue += expression[i];
+                outputQueue += " ";
                 continue;
             }
 
             // stack can't be empty AND top of stack cant be left parent AND token has to be greater
             // in precedence to top of stack
             while (!operatorStack.empty() && (operatorStack.back() != '(') &&
-                   op.at(operatorStack.back()) >= op.at(expression[i]))
+                   op.at(operatorStack.back()) <= op.at(expression[i]))
             {
                 outputQueue += operatorStack.back();
                 outputQueue += " ";
@@ -706,11 +792,6 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
             }
             //mismatched parenthesis
         }
-        else if(expression[i] == '}')
-        {
-            cout << "Mismatched Bracket" << endl;
-            return false;
-        }
     }
 
     for (size_t i = operatorStack.length() - 1; i != string::npos; --i)
@@ -719,6 +800,7 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
             return false;
         outputQueue += operatorStack[i];
         outputQueue += " ";
+        operatorStack.pop_back();
     }
 
     postfix = outputQueue;
@@ -850,4 +932,41 @@ void help()
     cout << "[LOAD <FILENAME>]                          Loads big num expressions from a given file!" << endl << endl;
 
     cout << border << endl << endl;
+}
+
+
+/**
+ * This function allows for immediate evaluation of expressions.
+ * @param expressions
+ * @return
+ */
+bool REPL(map<int, string> &expressions) {
+
+  std::string input, postfix;
+
+  try {
+    if (!GetInput(input, ">> "))
+      return true;
+
+    if (input.empty()) {
+      printf("Exiting REPL mode.\n");
+      return false;
+    }
+
+    if (shuntingYard(input, postfix, expressions))
+    {
+      cout << postfix << endl;
+      printf("=> %s\n", rpnEval(postfix).c_str());
+    }
+    else {
+      printf("\nError : Syntax Error\n");
+      return true;
+    }
+  }
+  catch (...) { // todo :: this doesnt seem to catch errors
+    printf("Error! Exiting REPL mode");
+    return false;
+  }
+
+  return true;
 }

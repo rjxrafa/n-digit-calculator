@@ -12,10 +12,29 @@ std::string Add(std::string op1, std::string op2) {
   bool fraction_op1 = false;
   bool fraction_op2 = false;
 
-  if (op1.find('/') == std::string::npos)
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
+
+  /**
+   * We need to determine whether the operands have fractions or not.
+   */
+  std::string op1_whole, op1_fraction;
+  std::stringstream ss(op1);
+
+  ss >> op1_whole >> op1_fraction;
+
+  ss.clear();
+  ss.str(op2);
+  std::string op2_whole, op2_fraction;
+  ss >> op2_whole >> op2_fraction;
+
+
+  if (op1_whole.find('/') != std::string::npos)
     fraction_op1 = true;
 
-  if (op1.find('/') < std::string::npos)
+  if (op1.find('/') != std::string::npos)
     fraction_op2 = true;
 
   if (op1[0] == '-') {
@@ -85,6 +104,11 @@ std::string Add(std::string op1, std::string op2) {
 std::string Subtract(std::string op1, std::string op2) {
   // todo check for negatives
   bool negative = false;
+
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
 
   if (op1[0] == '-') { // op1 (-)
     if (op2[0] != '-') { // op1(-), op2 (+)
@@ -226,15 +250,20 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string &op, const bool &&threaded){
+std::string Factorial(std::string &op, const bool &&threaded){ // todo : add threading operation
 
   if (op == "0")
     return "1";
 
-  if (op[0] == '-') {
-    printf("Invalid input! No negative numbers allowed.\n");
+  // Check for negatives and fractions
+  if (op[0] == '-' || op.find('/') != std::string::npos) {
+    printf("Invalid input!");
     return op;
   }
+
+  // Remove leading zeros
+  while (op[0] == '0')
+    op = op.substr(1);
 
   std::string factorial = "1",
               temp = "1",
@@ -249,7 +278,7 @@ std::string Factorial(std::string &op, const bool &&threaded){
 }
 
 /**
- * This function performs division between two operands. This function uses the restoring diviison algorithm
+ * This function performs division between two operands. This function uses the restoring division algorithm
  * which can be found here:
  *  https://web.stanford.edu/class/ee486/doc/chap5.pdf
  *
@@ -261,6 +290,11 @@ std::string Factorial(std::string &op, const bool &&threaded){
 std::string Divide(std::string op1, std::string op2, const bool &&mod) {
 
   bool negative = false;
+
+  if (op1.empty())
+    op1 = "0";
+  if (op2.empty())
+    op2 = "0";
 
   if (op1[0] == '-') {
     negative = !negative;
@@ -406,9 +440,17 @@ std::string GCD(std::string op1, std::string op2) {
     b = remainder;
   }
   return a;
-
 }
-std::string Negate(std::string op) {
+
+/**
+ * This function negates a given operand.
+ * @param op
+ * @return
+ */
+std::string Negate(const std::string &op) {
+
+  if (op.empty())
+    return "0";
 
   if (op[0] == '-')
     return op.substr(1);
@@ -416,3 +458,64 @@ std::string Negate(std::string op) {
     return '-'+op;
 }
 
+/**
+ * This function simplifies a given fraction and returns its most simplified form. This function supports mixed
+ * numbers as well.
+ * @param op
+ * @return
+ */
+std::string SimplifyFraction(const std::string &op) {
+  // todo account for mixed numbers
+
+  if (op.empty())
+    return "0";
+
+  std::string output = op;
+  bool negative = false;
+
+
+  if (output[0] == '-') {
+    output = output.substr(1);
+    negative = true;
+  }
+
+  /** Removing leading zeroes. **/
+  while (output[0] == '0')
+    output = output.substr(1);
+
+  std::string numerator, denominator, mixed = "";
+  std::stringstream ss(output);
+  /** Check if operand is a mixed number **/
+  if (output.find(' ') != std::string::npos) {
+    ss >> mixed;
+    ss.get(); // Remove space
+  }
+
+  getline(ss, numerator, '/'); // Retrieve numerator & denominator
+  ss >> denominator;
+
+  numerator = Add(numerator, Multiply(denominator, mixed)); // Add mixed, if applicable
+
+  std::string divisor = GCD(numerator, denominator);
+
+  numerator = Divide(numerator, divisor);
+  denominator = Divide(denominator, divisor);
+
+  if (IsSmaller(denominator, numerator)) { // Convert improper fractions into mixed numbers. Takes negative int account.
+    return (negative) ? '-'+Divide(numerator, denominator) : Divide(numerator, denominator);
+  }
+
+  if (negative)
+    numerator.insert(0, "-");
+
+  return (numerator + ((denominator == "1") ? "" : "/"+denominator));
+}
+
+/**
+ * This function will "normalize" the denominators of the given fraction to allow for operations on the numerator.
+ * @param op1
+ * @param op2
+ */
+void NormalizeFractions(std::string &op1, std::string &op2) {
+
+}
