@@ -33,6 +33,10 @@ void exit(const string &suffix, map<int, string> expressions, bool stored);
 void wexit(const string &suffix, map<int, string> expressions);
 void clear(map<int, string> &expressions);
 void load(const string &suffix, map<int, string>& expressions);
+void GCD(const string &suffix, map<int, string>& expressions);
+void Combinations(const string &suffix, map<int, string>& expressions);
+void Permutations(const string &suffix, map<int, string>& expressions);
+
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
@@ -42,7 +46,7 @@ bool REPL(map<int, string> &expressions);
 int main()
 {
 //    test_format();
-//    map<int, string> expressions;
+    map<int, string> expressions;
 
 //    introduction();
 //    while(1)
@@ -50,24 +54,24 @@ int main()
 //        map<int, string> expressions;
 //        REPL(expressions);
 //    }
-//    map<string, int> commands;
-//    string line;
-//    bool stored = false;
-//    loadCommands(commands);
-//    while(getLine(line))
-//        process(line, commands, expressions, stored);
-//    exit(line, expressions, stored);
-//    return 0;
-    while (1) {
-    std::string op1, op2;
-    while (!GetInput(op1, "op1: "));
-    while (!GetInput(op2, "op2: "));
+    map<string, int> commands;
+    string line;
+    bool stored = false;
+    loadCommands(commands);
+    while(getLine(line))
+        process(line, commands, expressions, stored);
+    exit(line, expressions, stored);
+    return 0;
+    //    while (1) {
+    //    std::string op1, op2;
+    //    while (!GetInput(op1, "op1: "));
+    //    while (!GetInput(op2, "op2: "));
 
-    std::cout << Add(op1,op2) << std::endl;
+    //    std::cout << Add(op1,op2) << std::endl;
 //    NormalizeFractions(op1, op2);
 //    std::cout << "op1: " << op1 << std::endl;
 //    std::cout << "op2: " << op2 << std::endl;
-    }
+
 }
 
 void introduction()
@@ -296,6 +300,9 @@ void executeCommand(const string &command, const string &suffix, const map<strin
         case 10:
             while (REPL(expressions));
             break;
+//        case 11:
+//            GCDCommand(suffix, expressions);
+//            break;
 
         default: cout << "Invalid command!" << endl;
     }
@@ -987,12 +994,12 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
-        operators['!'] = 3u;
-        operators['~'] = 3u;
-        operators['+'] = 2u;
-        operators['-'] = 2u;
-        operators['*'] = 1u;
-        operators['/'] = 1u;
+        operators['!'] = 3;
+        operators['~'] = 3;
+        operators['*'] = 2;
+        operators['/'] = 2;
+        operators['+'] = 1;
+        operators['-'] = 1;
         return true;
     } catch (...) {
         return false;
