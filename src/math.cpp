@@ -35,20 +35,19 @@ std::string Add(std::string op1, std::string op2) {
     return op1;
   }
 
-//  todo : might need to remove this part
-//  if (op1[0] == '-') { // This routine will check for negatives // todo:fractions
-//    if (op2[0] == '-') {
-//      negative = true;
-//      op1 = op1.substr(1);
-//      op2 = op2.substr(1);
-//    } else { // op1 (-), op2 (+)
-//      op1 = op1.substr(1);
-//      return Subtract(op2, op1);
-//    }
-//  } else if (op2[0] == '-') { // op1 (+), op2 (-)
-//    op2 = op2.substr(1);
-//    return Subtract(op1, op2);
-//  }
+  if (op1[0] == '-') { // This routine will check for negatives // todo:fractions
+    if (op2[0] == '-') {
+      negative = true;
+      op1 = op1.substr(1);
+      op2 = op2.substr(1);
+    } else { // op1 (-), op2 (+)
+      op1 = op1.substr(1);
+      return Subtract(op2, op1);
+    }
+  } else if (op2[0] == '-') { // op1 (+), op2 (-)
+    op2 = op2.substr(1);
+    return Subtract(op1, op2);
+  }
 
   /** Mixed Num / Fraction parser **/
   std::string op1_mixed = "0", op2_mixed = "0";
@@ -139,6 +138,13 @@ std::string Subtract(std::string op1, std::string op2) {
     NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
   }
 
+  while (op1[0] == '0') {
+    op1 = op1.substr(1);
+  }
+  while (op2[0] == '0') {
+    op2 = op2.substr(1);
+  }
+
   /** This routine checks for empty strings or 0 **/
   if (op1.empty()) { // This routine will check for empty strings or 0
     if (op2.empty())
@@ -149,19 +155,44 @@ std::string Subtract(std::string op1, std::string op2) {
     return op1;
   }
 
-//  if (op1[0] == '-') { // op1 (-)
-//    if (op2[0] != '-') { // op1(-), op2 (+)
-//      op1 = op1.substr(1);
-//      return '-' + Add(op1, op2);
-//    } else { // op1(-), op2(-)
-//      negative = true;
-//      op1 = op1.substr(1);
-//      op2 = op2.substr(1);
-//    }
-//  } else if (op2[0] == '-') { // op1 (+), op2 (-)
-//    op2 = op2.substr(1);
-//    return Add(op1, op2);
-//  }
+  if (op1[0] == '-') { // op1 (-)
+    if (op2[0] != '-') { // op1(-), op2 (+)
+      op1 = op1.substr(1);
+      return '-' + Add(op1, op2);
+    } else { // op1(-), op2(-)
+      negative = true;
+      op1 = op1.substr(1);
+      op2 = op2.substr(1);
+    }
+  } else if (op2[0] == '-') { // op1 (+), op2 (-)
+    op2 = op2.substr(1);
+    return Add(op1, op2);
+  }
+
+  /** Mixed Num / Fraction parser **/
+  std::string op1_mixed = "0", op2_mixed = "0";
+  std::string op1_numerator = "0", op2_denominator= "0";
+  std::string common_denominator = "1";
+
+  /** This method will parse for the numerator and common denominator. **/
+  if (fraction) {
+    std::stringstream ss(op1);
+    if (op1.find('_') != std::string::npos)
+      getline(ss, op1_mixed, '_');
+    getline(ss, op1, '/');
+    getline(ss, common_denominator);
+
+    ss.clear(); ss.str(op2);
+    if (op2.find('_') != std::string::npos)
+      getline(ss, op2_mixed, '_');
+    getline(ss, op2, '/');
+    getline(ss, common_denominator);
+
+    if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
+      op1 = Add(Multiply(op1_mixed, common_denominator), op1);
+    if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
+      op1 = Add(Multiply(op1_mixed, common_denominator), op2);
+  }
 
   if (IsSmaller(op1,op2)) {
     std::swap(op1, op2);
@@ -192,6 +223,11 @@ std::string Subtract(std::string op1, std::string op2) {
 
   while (diff[0] == '0')
     diff = diff.substr(1);
+
+  if (fraction) {
+    diff = diff + "/" + common_denominator;
+//    diff = SimplifyFraction(diff);
+  }
 
   return diff.empty() ? diff+'0' : (negative) ? ('-'+diff) : (diff);
 }
