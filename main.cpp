@@ -37,6 +37,7 @@ void GCD(const string &suffix, map<int, string>& expressions);
 void Combinations(const string &suffix, map<int, string>& expressions);
 void Permutations(const string &suffix, map<int, string>& expressions);
 
+
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
@@ -1030,6 +1031,9 @@ bool REPL(map<int, string> &expressions) {
       printf("Exiting REPL mode.\n");
       return false;
     }
+
+    purgeSpaces(input);
+
 
     if (shuntingYard(input, postfix, expressions))
     {
