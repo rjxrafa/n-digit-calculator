@@ -55,11 +55,6 @@ int main()
     while(getLine(line))
         process(line, commands, expressions, stored);
     exit(line, expressions, stored);
-
-//    std::string op1 = "2_2|3";
-//    std::string op2 = "2";
-//    std::cout << Add(op1,op2);
-//    return 0;
 }
 
 void introduction()

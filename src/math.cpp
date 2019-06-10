@@ -2,7 +2,7 @@
 
 /**
  * This function will add two strings together. Supports mixed numbers and fractions.
- * Mixed numbers and fractions are separated as follows: "3_1/2"
+ * Mixed numbers and fractions are separated as follows: "3_1|2"
  * @param op1
  * @param op2
  * @return
@@ -12,10 +12,19 @@ std::string Add(std::string op1, std::string op2) {
   bool fraction = false,
        negative = false;
 
-  /** This submethod turns all operands to their equivalent fraction. **/
-  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
-    fraction = true;
-    NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
+  /** Handle negatives **/
+  if (op1[0] == '-') { // This routine will check for negatives
+    if (op2[0] == '-') {
+      negative = true;
+      op1 = op1.substr(1);
+      op2 = op2.substr(1);
+    } else { // op1 (-), op2 (+)
+      op1 = op1.substr(1);
+      return Subtract(op2, op1);
+    }
+  } else if (op2[0] == '-') { // op1 (+), op2 (-)
+    op2 = op2.substr(1);
+    return Subtract(op1, op2);
   }
 
   while (op1[0] == '0') {
@@ -30,28 +39,19 @@ std::string Add(std::string op1, std::string op2) {
     if (op2.empty())
       return "0";
     else
-      return op2;
+      return SimplifyFraction(op2);
   } else if (op2.empty()) {
-    return op1;
+    return SimplifyFraction(op1);
   }
 
-  if (op1[0] == '-') { // This routine will check for negatives // todo:fractions
-    if (op2[0] == '-') {
-      negative = true;
-      op1 = op1.substr(1);
-      op2 = op2.substr(1);
-    } else { // op1 (-), op2 (+)
-      op1 = op1.substr(1);
-      return Subtract(op2, op1);
-    }
-  } else if (op2[0] == '-') { // op1 (+), op2 (-)
-    op2 = op2.substr(1);
-    return Subtract(op1, op2);
+  /** This submethod turns all operands to their equivalent fraction. **/
+  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
+    fraction = true;
+    NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
   }
 
   /** Mixed Num / Fraction parser **/
   std::string op1_mixed = "0", op2_mixed = "0";
-  std::string op1_numerator = "0", op2_denominator= "0";
   std::string common_denominator = "1";
 
   /** This method will parse for the numerator and common denominator. **/
@@ -71,7 +71,7 @@ std::string Add(std::string op1, std::string op2) {
     if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
       op1 = Add(Multiply(op1_mixed, common_denominator), op1);
     if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
-      op1 = Add(Multiply(op1_mixed, common_denominator), op2);
+      op2 = Add(Multiply(op1_mixed, common_denominator), op2);
   }
 
   if (op2.size() > op1.size()) // This routine is for ease in addition. (Adding smaller number to larger num)
@@ -115,14 +115,15 @@ std::string Add(std::string op1, std::string op2) {
 
   if (fraction) {
     sum = sum + "|" + common_denominator;
-//    sum = SimplifyFraction(sum);
   }
 
+  sum = SimplifyFraction(sum);
   return sum;
 }
 
 /**
- * This function subtracts the first operand from second operand.
+ * This function subtracts the first operand from second operand. Supports mixed numbers and fractions.
+ * Mixed numbers and fractions are separated as follows: "3_1|2"
  * @param op1
  * @param op2
  * @return
@@ -130,31 +131,9 @@ std::string Add(std::string op1, std::string op2) {
 std::string Subtract(std::string op1, std::string op2) {
 
   bool fraction = false,
-      negative = false;
+       negative = false;
 
-  /** This submethod turns all operands to their equivalent fraction. **/
-  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
-    fraction = true;
-    NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
-  }
-
-  while (op1[0] == '0') {
-    op1 = op1.substr(1);
-  }
-  while (op2[0] == '0') {
-    op2 = op2.substr(1);
-  }
-
-  /** This routine checks for empty strings or 0 **/
-  if (op1.empty()) { // This routine will check for empty strings or 0
-    if (op2.empty())
-      return "0";
-    else
-      return '-'+op2;
-  } else if (op2.empty()) {
-    return op1;
-  }
-
+  /** Handle negatives **/
   if (op1[0] == '-') { // op1 (-)
     if (op2[0] != '-') { // op1(-), op2 (+)
       op1 = op1.substr(1);
@@ -169,9 +148,34 @@ std::string Subtract(std::string op1, std::string op2) {
     return Add(op1, op2);
   }
 
+  while (op1[0] == '0') {
+    op1 = op1.substr(1);
+  }
+  while (op2[0] == '0') {
+    op2 = op2.substr(1);
+  }
+
+  /** This routine checks for empty strings or 0 **/
+  if (op1.empty()) { // This routine will check for empty strings or 0
+    if (op2.empty())
+      return "0";
+    else {
+      op2 = SimplifyFraction(op2);
+      return (negative) ? op2 : ('-'+op2);
+    }
+  } else if (op2.empty()) {
+    op1 = SimplifyFraction(op1);
+    return op1;
+  }
+
+  /** This submethod turns all operands to their equivalent fraction. **/
+  if (op1.find('|') != std::string::npos || op2.find('|') != std::string::npos) {
+    fraction = true;
+    NormalizeFractions(op1, op2); // This submethod turns all operands to equivalent fractions.
+  }
+
   /** Mixed Num / Fraction parser **/
   std::string op1_mixed = "0", op2_mixed = "0";
-  std::string op1_numerator = "0", op2_denominator= "0";
   std::string common_denominator = "1";
 
   /** This method will parse for the numerator and common denominator. **/
@@ -191,7 +195,7 @@ std::string Subtract(std::string op1, std::string op2) {
     if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
       op1 = Add(Multiply(op1_mixed, common_denominator), op1);
     if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
-      op1 = Add(Multiply(op1_mixed, common_denominator), op2);
+      op2 = Add(Multiply(op1_mixed, common_denominator), op2);
   }
 
   if (IsSmaller(op1,op2)) {
@@ -229,8 +233,8 @@ std::string Subtract(std::string op1, std::string op2) {
       return "0";
     else
       diff = diff + "|" + common_denominator;
-//    diff = SimplifyFraction(diff);
   }
+  diff = SimplifyFraction(diff);
 
   return diff.empty() ? "0" : ((negative) ? ('-'+diff) : (diff));
 }
@@ -265,11 +269,10 @@ bool IsSmaller(const std::string &op1, const std::string &op2) {
  */
 std::string Multiply(std::string op1, std::string op2) {
 
-  if (op1.empty() || op1 == "0" || op2.empty() || op2 == "0")
-    return "0";
+  bool fraction = false,
+      negative = false;
 
-  bool negative = false;
-
+  /** Handle negatives **/
   if (op1[0] == '-') {
     negative = !negative;
     op1 = op1.substr(1);
@@ -280,10 +283,63 @@ std::string Multiply(std::string op1, std::string op2) {
     op2 = op2.substr(1);
   }
 
-  if (op1 == "1")
+  if (op1 == "1") { // Identity Property
+    op2 = SimplifyFraction(op2);
     return ((negative) ? "-":"") + op2;
-  else if (op2 == "1")
+  } else if (op2 == "1") {
+    op2 = SimplifyFraction(op2);
     return ((negative) ? "-":"") + op1;
+  }
+
+  /** Handle zeroes **/
+  while (op1[0] == '0') {
+    op1 = op1.substr(1);
+  }
+  while (op2[0] == '0') {
+    op2 = op2.substr(1);
+  }
+  if (op1.empty() || op2.empty())
+    return "0";
+
+  /** This submethod turns all operands to their equivalent fraction. **/
+  if (op1.find('|') != std::string::npos) { // op1 is a fraction
+    if (op2.find('|') == std::string::npos) // op2 is not a fraction
+      op2 += "|1";
+    /** For multiplication, we don't need to normalize but we do need both to be in fraction form **/
+    fraction = true;
+  } else if (op2.find('|') != std::string::npos) {
+    op1 += "|1";
+    fraction = true;
+  }
+
+  /** Mixed Num / Fraction parser **/
+  std::string op1_mixed = "0",
+              op2_mixed = "0",
+              op1_denominator= "0",
+              op2_denominator= "0",
+              common_denominator = "1";
+
+  /** This method will parse for the numerator and common denominator. **/
+  if (fraction) {
+    std::stringstream ss(op1);
+    if (op1.find('_') != std::string::npos)
+      getline(ss, op1_mixed, '_');
+    getline(ss, op1, '|');
+    getline(ss, op1_denominator);
+
+    ss.clear(); ss.str(op2);
+    if (op2.find('_') != std::string::npos)
+      getline(ss, op2_mixed, '_');
+    getline(ss, op2, '|');
+    getline(ss, op2_denominator);
+
+    if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
+      op1 = Add(Multiply(op1_mixed, op1_denominator), op1);
+    if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
+      op2 = Add(Multiply(op1_mixed, op2_denominator), op2);
+
+    common_denominator = Multiply(op1_denominator, op2_denominator);
+  }
 
   if (op1.size() < op2.size()) {
     std::swap(op1,op2);
@@ -318,6 +374,11 @@ std::string Multiply(std::string op1, std::string op2) {
   if (negative)
     product = '-' + product;
 
+  if (fraction) {
+    product = product + "|" + common_denominator;
+    product = SimplifyFraction(product);
+  }
+
   return product.empty() ? "0" : product;
 }
 
@@ -327,15 +388,15 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string &op, const bool &&threaded){ // todo : add threading operation
+std::string Factorial(std::string op) { // todo : add threading operation
 
   if (op == "0")
     return "1";
 
   // Check for negatives and fractions
-  if (op[0] == '-' || op.find('/') != std::string::npos) {
+  if (op[0] == '-' || op.find('|') != std::string::npos || op.find('_') != std::string::npos) {
     printf("Invalid input!");
-    return op;
+    return "NaN";
   }
 
   // Remove leading zeros
@@ -343,8 +404,8 @@ std::string Factorial(std::string &op, const bool &&threaded){ // todo : add thr
     op = op.substr(1);
 
   std::string factorial = "1",
-      temp = "1",
-      increment = "1";
+              temp = "1",
+              increment = "1";
 
   while (temp != op) {
     temp = Add(temp, increment);
@@ -366,12 +427,8 @@ std::string Factorial(std::string &op, const bool &&threaded){ // todo : add thr
  */
 std::string Divide(std::string op1, std::string op2, const bool &&mod) {
 
-  bool negative = false;
-
-  if (op1.empty())
-    op1 = "0";
-  if (op2.empty())
-    op2 = "0";
+  bool negative = false,
+       fraction = false;
 
   if (op1[0] == '-') {
     negative = !negative;
@@ -389,13 +446,63 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   while (op2[0] == '0')
     op2 = op2.substr(1);
 
+  if (op1.empty())
+    op1 = "0";
   if (op2.empty()) {
-    printf("Divison by zero! Error.\n");
+    printf("Error! Division by zero.");
     return "NaN";
   }
 
-  if (op1 == op2)
+  if (op1 == op2) /** Identity Property **/
     return (negative) ? "-1" :"1";
+
+  /** This submethod turns all operands to their equivalent fraction. **/
+  if (op1.find('|') != std::string::npos) { // op1 is a fraction
+    if (op2.find('|') == std::string::npos) // op2 is not a fraction
+      op2 += "|1";
+    /** For multiplication, we don't need to normalize but we do need both to be in fraction form **/
+    fraction = true;
+  } else if (op2.find('|') != std::string::npos) {
+    op1 += "|1";
+    fraction = true;
+  }
+
+  if (fraction) {
+    /** Mixed Num / Fraction parser **/
+    std::string op1_mixed = "0",
+        op2_mixed = "0",
+        op1_denominator= "0",
+        op2_denominator= "0",
+        common_denominator = "1";
+
+    /** This method will parse for mixed numbers and the fraction parts **/
+    if (fraction) {
+      std::stringstream ss(op1);
+      if (op1.find('_') != std::string::npos)
+        getline(ss, op1_mixed, '_');
+      getline(ss, op1, '|');
+      getline(ss, op1_denominator);
+
+      ss.clear(); ss.str(op2);
+      if (op2.find('_') != std::string::npos)
+        getline(ss, op2_mixed, '_');
+      getline(ss, op2, '|');
+      getline(ss, op2_denominator);
+
+      if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
+        op1 = Add(Multiply(op1_mixed, op1_denominator), op1);
+      if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
+        op2 = Add(Multiply(op1_mixed, op2_denominator), op2);
+
+      if (negative)
+        op1 = '-'+op1;
+
+      op1 += "|" + op1_denominator;
+      op2 = op2_denominator + "|" + op2; // Reverse the divisor (Reciprocal)
+
+      return Multiply(op1, op2);
+    }
+  }
 
   if (IsSmaller(op1, op2)) {
     if (negative)
@@ -541,39 +648,36 @@ std::string Negate(const std::string &op) {
  * @param op
  * @return
  */
-std::string SimplifyFraction(const std::string &op) {
+std::string SimplifyFraction(std::string op) {
 
-  std::string output = op;
+  if (op.find('|') == std::string::npos) // If op is not a fraction, return op
+    return op;
+
+  bool negative = false;
+  /** Handle negatives **/
+  if (op[0] == '-') {
+    op = op.substr(1);
+    negative = true;
+  }
+
   /** Removing leading zeroes. **/
-  while (output[0] == '0')
-    output = output.substr(1);
+  while (op[0] == '0')
+    op = op.substr(1);
 
   if (op.empty())
     return "0";
 
-  bool negative = false;
-
-  if (output[0] == '-') {
-    output = output.substr(1);
-    negative = true;
-  }
-
   std::string numerator, denominator, mixed;
-  std::stringstream ss(output);
+  std::stringstream ss(op);
 
   /** Check if operand is a mixed number **/
-  if (output.find(' ') != std::string::npos) {
+  if (op.find('_') != std::string::npos) {
     ss >> mixed;
     ss.get(); // Remove space
   }
 
-  /** Check if operand is a fraction **/
-  if (output.find('|') != std::string::npos) {
-    getline(ss, numerator, '|'); // Retrieve numerator & denominator
-    ss >> denominator;
-  } else if (!mixed.empty()){
-    return mixed;
-  }
+  getline(ss, numerator, '|'); // Retrieve numerator & denominator
+  ss >> denominator;
 
   numerator = Add(numerator, Multiply(denominator, mixed)); // Add mixed, if applicable
 
@@ -673,4 +777,76 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
         Multiply(op1_numerator, op2_denominator) + "|" + Multiply(op1_denominator, op2_denominator);
   op2 = ((op2_is_negative) ? "-" : "") +
         Multiply(op2_numerator, op1_denominator) + "|" + Multiply(op2_denominator, op1_denominator);
+}
+
+std::string Combination(std::string op1, std::string op2) {
+
+  if (op1.find('-') != std::string::npos ||
+      op1.find('|') != std::string::npos ||
+      op1.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  if (op2.find('-') != std::string::npos ||
+      op2.find('|') != std::string::npos ||
+      op2.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  // Remove leading zeros
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (IsSmaller(op1, op2)) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  std::string numerator,
+              denominator;
+
+  numerator = (Factorial(op1));
+  denominator = (Multiply(Factorial(op2), Factorial(Subtract(op1, op2))));
+
+  return SimplifyFraction(numerator+"|"+denominator);
+}
+
+std::string Permutation(std::string op1, std::string op2) {
+
+  if (op1.find('-') != std::string::npos ||
+      op1.find('|') != std::string::npos ||
+      op1.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  if (op2.find('-') != std::string::npos ||
+      op2.find('|') != std::string::npos ||
+      op2.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  // Remove leading zeros
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (IsSmaller(op1, op2)) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  std::string numerator,
+      denominator;
+
+  numerator = (Factorial(op1));
+  denominator = (Factorial(Subtract(op1, op2)));
+
+  return SimplifyFraction(numerator+"|"+denominator);
 }
