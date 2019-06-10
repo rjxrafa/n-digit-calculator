@@ -59,13 +59,13 @@ std::string Add(std::string op1, std::string op2) {
     std::stringstream ss(op1);
     if (op1.find('_') != std::string::npos)
       getline(ss, op1_mixed, '_');
-    getline(ss, op1, '/');
+    getline(ss, op1, '|');
     getline(ss, common_denominator);
 
     ss.clear(); ss.str(op2);
     if (op2.find('_') != std::string::npos)
       getline(ss, op2_mixed, '_');
-    getline(ss, op2, '/');
+    getline(ss, op2, '|');
     getline(ss, common_denominator);
 
     if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
@@ -114,7 +114,7 @@ std::string Add(std::string op1, std::string op2) {
     sum = '-'+sum;
 
   if (fraction) {
-    sum = sum + "/" + common_denominator;
+    sum = sum + "|" + common_denominator;
 //    sum = SimplifyFraction(sum);
   }
 
@@ -179,13 +179,13 @@ std::string Subtract(std::string op1, std::string op2) {
     std::stringstream ss(op1);
     if (op1.find('_') != std::string::npos)
       getline(ss, op1_mixed, '_');
-    getline(ss, op1, '/');
+    getline(ss, op1, '|');
     getline(ss, common_denominator);
 
     ss.clear(); ss.str(op2);
     if (op2.find('_') != std::string::npos)
       getline(ss, op2_mixed, '_');
-    getline(ss, op2, '/');
+    getline(ss, op2, '|');
     getline(ss, common_denominator);
 
     if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
@@ -225,11 +225,14 @@ std::string Subtract(std::string op1, std::string op2) {
     diff = diff.substr(1);
 
   if (fraction) {
-    diff = diff + "/" + common_denominator;
+    if (diff.empty())
+      return "0";
+    else
+      diff = diff + "|" + common_denominator;
 //    diff = SimplifyFraction(diff);
   }
 
-  return diff.empty() ? diff+'0' : (negative) ? ('-'+diff) : (diff);
+  return diff.empty() ? "0" : ((negative) ? ('-'+diff) : (diff));
 }
 
 /**
