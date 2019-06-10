@@ -47,13 +47,7 @@ int main()
 {
 //    test_format();
     map<int, string> expressions;
-
-//    introduction();
-//    while(1)
-//    {
-//        map<int, string> expressions;
-//        REPL(expressions);
-//    }
+    introduction();
     map<string, int> commands;
     string line;
     bool stored = false;
@@ -62,16 +56,6 @@ int main()
         process(line, commands, expressions, stored);
     exit(line, expressions, stored);
     return 0;
-    //    while (1) {
-    //    std::string op1, op2;
-    //    while (!GetInput(op1, "op1: "));
-    //    while (!GetInput(op2, "op2: "));
-
-    //    std::cout << Add(op1,op2) << std::endl;
-//    NormalizeFractions(op1, op2);
-//    std::cout << "op1: " << op1 << std::endl;
-//    std::cout << "op2: " << op2 << std::endl;
-
 }
 
 void introduction()
