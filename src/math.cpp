@@ -388,7 +388,7 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string &op, const bool &&threaded){ // todo : add threading operation
+std::string Factorial(std::string op) { // todo : add threading operation
 
   if (op == "0")
     return "1";
@@ -777,4 +777,40 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
         Multiply(op1_numerator, op2_denominator) + "|" + Multiply(op1_denominator, op2_denominator);
   op2 = ((op2_is_negative) ? "-" : "") +
         Multiply(op2_numerator, op1_denominator) + "|" + Multiply(op2_denominator, op1_denominator);
+}
+
+std::string Combination(std::string op1, std::string op2) {
+
+  if (op1.find('-') != std::string::npos ||
+      op1.find('|') != std::string::npos ||
+      op1.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  if (op2.find('-') != std::string::npos ||
+      op2.find('|') != std::string::npos ||
+      op2.find('_') != std::string::npos) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  // Remove leading zeros
+  while (op1[0] == '0')
+    op1 = op1.substr(1);
+  while (op2[0] == '0')
+    op2 = op2.substr(1);
+
+  if (IsSmaller(op1, op2)) {
+    printf("Error! Invalid input.");
+    return "NaN";
+  }
+
+  std::string numerator,
+              denominator;
+
+  numerator = (Factorial(op1));
+  denominator = (Multiply(Factorial(op2), Factorial(Subtract(op1, op2))));
+
+  return SimplifyFraction(numerator+"|"+denominator);
 }
