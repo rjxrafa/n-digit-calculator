@@ -63,7 +63,7 @@ int main()
     while (!GetInput(op1, "op1: "));
     while (!GetInput(op2, "op2: "));
 
-    std::cout << Subtract(op1,op2) << std::endl;
+    std::cout << Add(op1,op2) << std::endl;
 //    NormalizeFractions(op1, op2);
 //    std::cout << "op1: " << op1 << std::endl;
 //    std::cout << "op2: " << op2 << std::endl;
