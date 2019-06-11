@@ -38,6 +38,9 @@ void Permutations(const string &suffix, map<int, string>& expressions);
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
+string format_result(string result);
+string formatRPN(string rpn);
+
 void help();
 bool REPL(map<int, string> &expressions);
 
@@ -248,6 +251,9 @@ void purgeSpaces(string &line)
                     }
                     temp = "";
                 }
+            }
+            else {
+                formatted += line[i];
             }
         }
         //FOR PERMUTATION
@@ -475,7 +481,7 @@ void executeCommand(const string &command, const string &suffix, const map<strin
  */
 void let(const string& suffix, map<int, string>& expressions)
 {
-    bool debug = false;
+    bool debug = true;
 
     stringstream ss(suffix);
     string infix;
@@ -519,7 +525,7 @@ void let(const string& suffix, map<int, string>& expressions)
         else if(shuntingYard(infix, postfix, expressions))
         {
 
-            if(debug){cout << "POSTFIX: " << postfix << endl;}
+            if(debug){cout << "Postfix ->: " << formatRPN(postfix) << endl;}
             //            if(invalidInput(postfix))
             //            {
             //                return;
@@ -558,7 +564,7 @@ void show(const string& suffix, map<int, string> expressions)
     {
         if(int(suffix[0]-65) < expressions.size())
         {
-            cout << suffix[0] << " = " << expressions[int(suffix[0]) -65] << endl;
+            cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
         }
         else
         {
@@ -584,7 +590,7 @@ void list(map<int, string>& expressions)
 
     for(int i = 0; i < expressions.size(); ++i) {
         cout << char(i+65) << " = ";
-        cout << expressions[i] << endl;
+        cout << format_result(expressions[i]) << endl;
     }
 }
 
@@ -733,7 +739,7 @@ void save(const string &suffix, map<int, string> expressions, bool &stored)
     }
 
     for(int i = 0; i < expressions.size(); ++i)
-        out << char(i + 65) << " = " << expressions[i] << endl;
+        out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
 
     std::cout << "Save successful." << std::endl;
 
@@ -1223,6 +1229,42 @@ void help()
     cout << border << endl << endl;
 }
 
+//functions for nice output
+string formatRPN(string rpn)
+{
+    string temp = "";
+    for(int i = 0; i < rpn.size(); ++i)
+    {
+        if(rpn[i] == '|')
+            temp+= '/';
+        else if(rpn[i] == '_')
+            temp+= ' ';
+        else {
+            temp+= rpn[i];
+        }
+    }
+    return temp;
+}
+
+string format_result(string result)
+{
+    string temp = "";
+    if(result.empty())
+        temp = "{}";
+    else {
+        for(int i = 0; i < result.size(); ++i)
+        {
+            if(result[i] == '|')
+                temp+= '/';
+            else if(result[i] == '_')
+                temp+= ' ';
+            else {
+                temp+= result[i];
+            }
+        }
+    }
+    return temp;
+}
 
 /**
  * This function allows for immediate evaluation of expressions.
@@ -1247,7 +1289,7 @@ bool REPL(map<int, string> &expressions) {
         if (shuntingYard(input, postfix, expressions))
         {
             cout << postfix << endl;
-            printf("=> %s\n", rpnEval(postfix).c_str());
+            printf("=> %s\n", format_result(rpnEval(postfix)).c_str());
         }
         else {
             printf("\nError : Syntax Error\n");
