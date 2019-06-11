@@ -18,12 +18,11 @@ void process(string &line, const map<string, int> &commands,
              map<int, string>& expressions, bool &stored);
 void trimLineAndStandardize(string &line);
 void purgeSpaces(string &line);
+string formatInfix(string input);
 void findCommand(string line, string &command, string &suffix);
 void executeCommand(const string &command, const string &suffix,
                     const map<string, int> &commands,
                     map<int, string>& expressions, bool &stored);
-
-//string formatInfix(string infix);
 void let(const string& suffix, map<int, string>& expressions);
 void edit(const string& suffix, map<int, string>& expressions);
 void show(const string& suffix, map<int, string> expressions);
@@ -36,8 +35,6 @@ void load(const string &suffix, map<int, string>& expressions);
 void GCD(const string &suffix, map<int, string>& expressions);
 void Combinations(const string &suffix, map<int, string>& expressions);
 void Permutations(const string &suffix, map<int, string>& expressions);
-
-
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
@@ -118,6 +115,7 @@ void trimLineAndStandardize(string &line)
 
 /**
  * This function removes all spaces from a given string
+ * also formats mixed numbers, gcd,
  * @param suffix
  */
 void purgeSpaces(string &line)
@@ -125,6 +123,7 @@ void purgeSpaces(string &line)
     std::string temp = "";
     string formatted = "";
     bool validMixed = false;
+    bool validSymb = false;
     int j = 0;
     for (unsigned int i = 0; i < line.length(); ++i)
     {
@@ -195,6 +194,186 @@ void purgeSpaces(string &line)
 
             }
         }
+        //FOR COMBINATION
+        //handle weird inputs
+        else if(line[i] == 'C')
+        {
+            //check if combination
+            j = i;
+            while(j+1 < line.length() && line[j+1] == ' ')
+                j++;
+            if(j+1 < line.length() && line[j+1] == '(')
+            {
+                j++;
+                //clean more spaces
+                while(j+1 < line.length() && line[j+1] == ' ')
+                    j++;
+                //get first number
+                while (j + 1 < line.length() && isdigit(line[j+1]))
+                {
+                    j++;
+                    temp += line[j];
+                }
+                //add symbol for C
+                temp += '@';
+                //clean more spaces
+                while(j+1 < line.length() && line[j+1] == ' ')
+                    j++;
+                if(j+1 < line.length() && line[j+1] == ',')
+                {
+                    j++;
+                    //clean more spaces
+                    while(j+1 < line.length() && line[j+1] == ' ')
+                        j++;
+
+                    //get second number
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
+
+                    //clean more spaces
+                    while(j+1 < line.length() && line[j+1] == ' ')
+                        j++;
+                    if(j+1 < line.length() && line[j+1] == ')')
+                    {
+                        j++;
+                        validSymb = true;
+                    }
+                    if(validSymb = true)
+                    {
+                        i = j;
+                        formatted += temp;
+                    }
+                    temp = "";
+                }
+            }
+        }
+        //FOR PERMUTATION
+        else if(line[i] == 'P')
+        {
+            //check if combination
+            j = i;
+            while(j+1 < line.length() && line[j+1] == ' ')
+                j++;
+            if(j+1 < line.length() && line[j+1] == '(')
+            {
+                j++;
+                //clean more spaces
+                while(j+1 < line.length() && line[j+1] == ' ')
+                    j++;
+                //get first number
+                while (j + 1 < line.length() && isdigit(line[j+1]))
+                {
+                    j++;
+                    temp += line[j];
+                }
+                //add symbol for C
+                temp += '#';
+                //clean more spaces
+                while(j+1 < line.length() && line[j+1] == ' ')
+                    j++;
+                if(j+1 < line.length() && line[j+1] == ',')
+                {
+                    j++;
+                    //clean more spaces
+                    while(j+1 < line.length() && line[j+1] == ' ')
+                        j++;
+
+                    //get second number
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
+
+                    //clean more spaces
+                    while(j+1 < line.length() && line[j+1] == ' ')
+                        j++;
+                    if(j+1 < line.length() && line[j+1] == ')')
+                    {
+                        j++;
+                        validSymb = true;
+                    }
+                    if(validSymb = true)
+                    {
+                        i = j;
+                        formatted += temp;
+                    }
+                    temp = "";
+                }
+            }
+        }
+        //for GCD
+        else if(line[i] == 'G')
+        {
+            //clean spaces and tabs around here
+            //check if combination
+            j = i;
+            while(j+1 < line.length() && line[j+1] == ' ')
+                j++;
+            if(j+1 < line.length() && line[j+1] == 'C')
+            {
+                j++;
+                if(j+1 < line.length() && line[j+1] == 'D')
+                {
+                    j++;
+                    while(j+1 < line.length() && line[j+1] == ' ')
+                        j++;
+                    if(j+1 < line.length() && line[j+1] == '(')
+                    {
+                        j++;
+                        //clean more spaces
+                        while(j+1 < line.length() && line[j+1] == ' ')
+                            j++;
+                        //get first number
+                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        {
+                            j++;
+                            temp += line[j];
+                        }
+                        //add symbol for C
+                        temp += '$';
+                        //clean more spaces
+                        while(j+1 < line.length() && line[j+1] == ' ')
+                            j++;
+                        if(j+1 < line.length() && line[j+1] == ',')
+                        {
+                            j++;
+                            //clean more spaces
+                            while(j+1 < line.length() && line[j+1] == ' ')
+                                j++;
+
+                            //get second number
+                            while (j + 1 < line.length() && isdigit(line[j+1]))
+                            {
+                                j++;
+                                temp += line[j];
+                            }
+
+                            //clean more spaces
+                            while(j+1 < line.length() && line[j+1] == ' ')
+                                j++;
+                            if(j+1 < line.length() && line[j+1] == ')')
+                            {
+                                j++;
+                                validSymb = true;
+                            }
+                            if(validSymb = true)
+                            {
+                                i = j;
+                                formatted += temp;
+                            }
+                            temp = "";
+                        }
+                    }
+                }
+            }
+            else
+                cout << line[j+1];
+        }
+        //takes in letters
         else if(line[i] != ' ')
         {
             formatted += line[i];
@@ -237,6 +416,7 @@ void process(string &line, const map<string, int> &commands,
         stored = false;
     }
     purgeSpaces(suffix);
+//    cout << suffix << endl;
     executeCommand(command, suffix, commands, expressions, stored);
 }
 
@@ -250,44 +430,41 @@ void executeCommand(const string &command, const string &suffix, const map<strin
         whatToDo = 99;
     switch(whatToDo)
     {
-        case 0:
-            let(suffix, expressions);
-            break;
-        case 1:
-            show(suffix, expressions);
-            break;
-        case 2:
-            list(expressions);
-            break;
-        case 3:
-            help();
-            break;
-        case 4:
-            save(suffix, expressions, stored);
-            break;
-        case 5:
-            load(suffix, expressions);
-            break;
-        case 6:
-            edit(suffix, expressions);
-            break;
-        case 7:
-            exit(suffix, expressions, stored);
-            break;
-        case 8:
-            wexit(suffix, expressions);
-            break;
-        case 9:
-            clear(expressions);
-            break;
-        case 10:
-            while (REPL(expressions));
-            break;
-//        case 11:
-//            GCDCommand(suffix, expressions);
-//            break;
+    case 0:
+        let(suffix, expressions);
+        break;
+    case 1:
+        show(suffix, expressions);
+        break;
+    case 2:
+        list(expressions);
+        break;
+    case 3:
+        help();
+        break;
+    case 4:
+        save(suffix, expressions, stored);
+        break;
+    case 5:
+        load(suffix, expressions);
+        break;
+    case 6:
+        edit(suffix, expressions);
+        break;
+    case 7:
+        exit(suffix, expressions, stored);
+        break;
+    case 8:
+        wexit(suffix, expressions);
+        break;
+    case 9:
+        clear(expressions);
+        break;
+    case 10:
+        while (REPL(expressions));
+        break;
 
-        default: cout << "Invalid command!" << endl;
+    default: cout << "Invalid command!" << endl;
     }
 }
 
@@ -298,7 +475,7 @@ void executeCommand(const string &command, const string &suffix, const map<strin
  */
 void let(const string& suffix, map<int, string>& expressions)
 {
-    bool debug = true;
+    bool debug = false;
 
     stringstream ss(suffix);
     string infix;
@@ -315,7 +492,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*=+!()-/|_") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-/|_") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
@@ -343,10 +520,10 @@ void let(const string& suffix, map<int, string>& expressions)
         {
 
             if(debug){cout << "POSTFIX: " << postfix << endl;}
-//            if(invalidInput(postfix))
-//            {
-//                return;
-//            }
+            //            if(invalidInput(postfix))
+            //            {
+            //                return;
+            //            }
             expressions[int(index) - 65] = rpnEval(postfix);
         }
         return;
@@ -533,9 +710,9 @@ void save(const string &suffix, map<int, string> expressions, bool &stored)
     in.close();
     if(in.fail())
         out.open(filename);
-        //if file already exists, the program must notify the user
-        //that it does and ask if they want to erase the current file of give
-        //another file name.
+    //if file already exists, the program must notify the user
+    //that it does and ask if they want to erase the current file of give
+    //another file name.
     else {
         in.clear();
         std::cout << "That file exists!!" << std::endl;
@@ -590,184 +767,196 @@ void load(const string &suffix, map<int, string>& expressions)
 string formatInfix(string input)
 {
     //removes all whitespaces
-     string formatted = "";
-     bool negative_start = false;
+    string formatted = "";
+    bool negative_start = false;
 
-   for (int i = 0; i < input.length(); ++i)
-   {
-       //negative check
-       if(input[0] == '-' && !negative_start)
-       {
-           negative_start = true;
-           formatted += '~';
-           formatted += " ";
-           while(i + 1 < input.length() && input[i+1] == '-')
-           {
-               i++;
-               formatted += '~';
-               formatted += " ";
-           }
-           while (i + 1 < input.length() && isdigit(input[i+1]) || input[i+1] == '.')
-           {
-               i++;
-               formatted += input[i];
-           }
-           if(i+1 < input.length() && input[i+1] == '_')
-           {
-               i++;
-               formatted += input[i];
-               while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
-                     && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' ')
-               {
-                   i++;
-                   formatted += input[i];
-               }
-           }
-           formatted += " ";
-       }
+    for (int i = 0; i < input.length(); ++i)
+    {
+        //negative check
+        if(input[0] == '-' && !negative_start)
+        {
+            negative_start = true;
+            formatted += '~';
+            formatted += " ";
+            while(i + 1 < input.length() && input[i+1] == '-')
+            {
+                i++;
+                formatted += '~';
+                formatted += " ";
+            }
+            while (i + 1 < input.length() && isdigit(input[i+1]) || input[i+1] == '.')
+            {
+                i++;
+                formatted += input[i];
+            }
+            if(i+1 < input.length() && input[i+1] == '_')
+            {
+                i++;
+                formatted += input[i];
+                while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
+                      && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                {
+                    i++;
+                    formatted += input[i];
+                }
+            }
+            formatted += " ";
+        }
 
-       //EX. formatting 123
-       else if (isdigit(input[i]))
-       {
-           formatted += input[i];
-           while (i + 1 < input.length() && (isdigit(input[i+1])))
-           {
-               i++;
-               formatted += input[i];
-           }
-           //mixed number
-           if(i+1 < input.length() && input[i+1] == '_')
-           {
-               i++;
-               formatted += input[i];
-               while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
-                     && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' ')
-               {
-                   i++;
-                   formatted += input[i];
-               }
-           }
-           formatted += " ";
-       }
+        //EX. formatting 123
+        else if (isdigit(input[i]))
+        {
+            formatted += input[i];
+            while (i + 1 < input.length() && (isdigit(input[i+1])))
+            {
+                i++;
+                formatted += input[i];
+            }
+            //mixed number
+            if(i+1 < input.length() && input[i+1] == '_')
+            {
+                i++;
+                formatted += input[i];
+                while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
+                      && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                {
+                    i++;
+                    formatted += input[i];
+                }
+            }
+            formatted += " ";
+        }
 
-       //-123
-       else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/')
-       {
-           formatted += input[i];
-           formatted += " ";
-           //negative check
-           if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
-           {
-               //check if negative
-               if(input[i+1] == '-')
-               {
-                  i++;
-                  formatted += '~';
-                  formatted += " ";
-                  while(i + 1 < input.length() && input[i+1] == '-')
-                  {
-                      i++;
-                      formatted += '~';
-                      formatted += " ";
-                  }
-               }
-               else {
-                   i++;
-               }
+        //-123
+        else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/'
+                 || input[i] == '@' || input[i] == '#' || input[i] == '$')
+        {
+            formatted += input[i];
+            formatted += " ";
+            //negative check
+            if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
+            {
+                //check if negative
+                if(input[i+1] == '-')
+                {
+                    i++;
+                    formatted += '~';
+                    formatted += " ";
+                    while(i + 1 < input.length() && input[i+1] == '-')
+                    {
+                        i++;
+                        formatted += '~';
+                        formatted += " ";
+                    }
+                }
+                else {
+                    i++;
+                }
 
-               while (i + 1 < input.length() && (isdigit(input[i+1])))
-               {
-                   i++;
-                   formatted += input[i];
-               }
-               if(i+1 < input.length() && input[i+1] == '_')
-               {
-                   i++;
-                   formatted += input[i];
-                   while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
-                         && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' ')
-                   {
-                       i++;
-                       formatted += input[i];
-                   }
-               }
-               formatted += " ";
-           }
-       }
+                while (i + 1 < input.length() && (isdigit(input[i+1])))
+                {
+                    i++;
+                    formatted += input[i];
+                }
+                if(i+1 < input.length() && input[i+1] == '_')
+                {
+                    i++;
+                    formatted += input[i];
+                    while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
+                          && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
+                          && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                    {
+                        i++;
+                        formatted += input[i];
+                    }
+                }
+                formatted += " ";
+            }
+        }
 
-       //if left parenthesis, check for negatives after
-       else if( input[i] == '(')
-       {
-           formatted += input[i];
-           formatted += " ";
-           //(-123
-           if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
-           {
-               if (i + 2 < input.length() && isdigit(input[i+2]))
-               {
-                   if(input[i+1] == '-')
-                   {
-                       formatted += '~';
-                       formatted += " ";
-                   }
-                   formatted += input[i+2];
-                   i++;
-                   i++;
-                   while (i + 1 < input.length() && (isdigit(input[i+1])))
-                   {
-                       i++;
-                       formatted += input[i];
-                   }
-                   if(i+1 < input.length() && input[i+1] == '_')
-                   {
-                       i++;
-                       formatted += input[i];
-                       while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
-                             && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' ')
-                       {
-                           i++;
-                           formatted += input[i];
-                       }
-                   }
-                   formatted+= " ";
-               }
-               else if(i+2 < input.length() && input[i+2] == '(')
-               {
-                   formatted += '~';
-                   formatted += " ";
-                   i++;
-               }
-               else if(i+2 < input.length() && input[i+2] == '-')
-               {
-                   i++;
-                   i++;
-                   formatted += '~';
-                   formatted += " ";
-                   formatted += '~';
-                   formatted += " ";
-                   while(i + 1 < input.length() && input[i+1] == '-')
-                   {
-                       i++;
-                       formatted += '~';
-                       formatted += " ";
-                   }
-               }
-           }
-       }
-       //if right parenthesis add it to formated
-       else if(input[i] == ')')
-       {
-           formatted += input[i];
-           formatted += " ";
-       }
-       else if(input[i] == '!')
-       {
-           formatted += input[i];
-           formatted += " ";
-       }
-       //throw error
-   }
-   return formatted;
+        //if left parenthesis, check for negatives after
+        else if( input[i] == '(')
+        {
+            formatted += input[i];
+            formatted += " ";
+            //(-123
+            if(i + 1 < input.length() && ((input[i+1] == '-') || (input[i+1] == '+')))
+            {
+                if (i + 2 < input.length() && isdigit(input[i+2]))
+                {
+                    if(input[i+1] == '-')
+                    {
+                        formatted += '~';
+                        formatted += " ";
+                    }
+                    formatted += input[i+2];
+                    i++;
+                    i++;
+                    while (i + 1 < input.length() && (isdigit(input[i+1])))
+                    {
+                        i++;
+                        formatted += input[i];
+                    }
+                    if(i+1 < input.length() && input[i+1] == '_')
+                    {
+                        i++;
+                        formatted += input[i];
+                        while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
+                              && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
+                              && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                        {
+                            i++;
+                            formatted += input[i];
+                        }
+                    }
+                    formatted+= " ";
+                }
+                else if(i+2 < input.length() && input[i+2] == '(')
+                {
+                    formatted += '~';
+                    formatted += " ";
+                    i++;
+                }
+                else if(i+2 < input.length() && input[i+2] == '-')
+                {
+                    i++;
+                    i++;
+                    formatted += '~';
+                    formatted += " ";
+                    formatted += '~';
+                    formatted += " ";
+                    while(i + 1 < input.length() && input[i+1] == '-')
+                    {
+                        i++;
+                        formatted += '~';
+                        formatted += " ";
+                    }
+                }
+            }
+        }
+        else if(input[i] >= 'A' && input[i] <= 'Z')
+        {
+            formatted += input[i];
+            formatted += " ";
+        }
+        //if right parenthesis add it to formated
+        else if(input[i] == ')')
+        {
+            formatted += input[i];
+            formatted += " ";
+        }
+        else if(input[i] == '!')
+        {
+            formatted += input[i];
+            formatted += " ";
+        }
+
+
+        //throw error
+    }
+    return formatted;
 }
 
 /**
@@ -778,7 +967,7 @@ string formatInfix(string input)
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions)
 {
     expression = formatInfix(expression);
-    cout << expression << endl;
+//    cout << expression << endl;
     bool debug = false;
     string outputQueue = "";
     postfix = "";
@@ -797,6 +986,7 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         {
             string numbers = "", set;
             numbers += expression[i];
+            //check for mixed numbers or mixed numbers
             while(i < expression.size() && (isdigit(expression[i+1]) || expression[i+1] == '_'
                                             || expression[i+1] == '|'))
             {
@@ -821,15 +1011,9 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
 
         else if (op.count(expression[i]))
         {
-            if(expression[i] == '~')
+            if(expression[i] == '~' || expression[i] == '!')
             {
                 operatorStack.push_back(expression[i]);
-                continue;
-            }
-            else if (expression[i] == '!')
-            {
-                outputQueue += expression[i];
-                outputQueue += " ";
                 continue;
             }
 
@@ -902,8 +1086,9 @@ string rpnEval(const string& postfix)
         {
             string numbers = "", set;
             numbers += postfix[i];
+            //check for mixed or normal number
             while(i < postfix.size() && (isdigit(postfix[i+1]) || postfix[i+1] == '_'
-                                            || postfix[i+1] == '|'))
+                                         || postfix[i+1] == '|'))
             {
                 numbers+= postfix[i+1];
                 i++;
@@ -915,52 +1100,79 @@ string rpnEval(const string& postfix)
             string first, second, result;
             switch(postfix[i])
             {
-                case '!':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    result = Factorial(first);
-                    outputStack.push_back(result);
-                    break;
-                case '~':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    result = Negate(first);
-                    outputStack.push_back(result);
-                    break;
-                case '+':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    second = outputStack.back();
-                    outputStack.pop_back();
-                    result = Add(second, first);
-                    outputStack.push_back(result);
-                    break;
-                case '-':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    second = outputStack.back();
-                    outputStack.pop_back();
-                    result = Subtract(second, first);
-                    outputStack.push_back(result);
-                    break;
-                case '*':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    second = outputStack.back();
-                    outputStack.pop_back();
-                    result = Multiply(second, first);
-                    outputStack.push_back(result);
-                    break;
-                case '/':
-                    first = outputStack.back();
-                    outputStack.pop_back();
-                    second = outputStack.back();
-                    outputStack.pop_back();
-                    result = Divide(second, first);
-                    outputStack.push_back(result);
-                    break;
-                default:
-                    break;
+            //combination
+            case '@':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Combination(second, first);
+                outputStack.push_back(result);
+                break;
+            //permutation
+            case '#':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Permutation(second, first);
+                outputStack.push_back(result);
+                break;
+            //GCD
+            case '$':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = GCD(second, first);
+                outputStack.push_back(result);
+                break;
+            case '!':
+                first = outputStack.back();
+                outputStack.pop_back();
+                result = Factorial(first);
+                outputStack.push_back(result);
+                break;
+            case '~':
+                first = outputStack.back();
+                outputStack.pop_back();
+                result = Negate(first);
+                outputStack.push_back(result);
+                break;
+            case '+':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Add(second, first);
+                outputStack.push_back(result);
+                break;
+            case '-':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Subtract(second, first);
+                outputStack.push_back(result);
+                break;
+            case '*':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Multiply(second, first);
+                outputStack.push_back(result);
+                break;
+            case '/':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Divide(second, first);
+                outputStack.push_back(result);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -977,6 +1189,9 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
+        operators['@'] = 3;
+        operators['#'] = 3;
+        operators['$'] = 3;
         operators['!'] = 3;
         operators['~'] = 3;
         operators['*'] = 2;
@@ -1016,32 +1231,32 @@ void help()
  */
 bool REPL(map<int, string> &expressions) {
 
-  std::string input, postfix;
-  try {
-    if (!GetInput(input, ">> "))
-      return true;
+    std::string input, postfix;
+    try {
+        if (!GetInput(input, ">> "))
+            return true;
 
-    if (input.empty()) {
-      printf("Exiting REPL mode.\n");
-      return false;
+        if (input.empty()) {
+            printf("Exiting REPL mode.\n");
+            return false;
+        }
+
+        purgeSpaces(input);
+
+
+        if (shuntingYard(input, postfix, expressions))
+        {
+            cout << postfix << endl;
+            printf("=> %s\n", rpnEval(postfix).c_str());
+        }
+        else {
+            printf("\nError : Syntax Error\n");
+            return true;
+        }
     }
-
-    purgeSpaces(input);
-
-
-    if (shuntingYard(input, postfix, expressions))
-    {
-      cout << postfix << endl;
-      printf("=> %s\n", rpnEval(postfix).c_str());
+    catch (...) { // todo :: this doesnt seem to catch errors
+        printf("Error! Exiting REPL mode");
+        return false;
     }
-    else {
-      printf("\nError : Syntax Error\n");
-      return true;
-    }
-  }
-  catch (...) { // todo :: this doesnt seem to catch errors
-    printf("Error! Exiting REPL mode");
-    return false;
-  }
-  return true;
+    return true;
 }

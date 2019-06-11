@@ -837,7 +837,8 @@ std::string Permutation(std::string op1, std::string op2) {
   while (op2[0] == '0')
     op2 = op2.substr(1);
 
-  if (IsSmaller(op1, op2)) {
+  if (IsSmaller(op1, op2))
+  {
     printf("Error! Invalid input.");
     return "NaN";
   }
