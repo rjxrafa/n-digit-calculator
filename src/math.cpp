@@ -388,7 +388,7 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string op) { // todo : add threading operation
+std::string Factorial(std::string op, std::string end) { // todo : add threading operation
 
   if (op == "0")
     return "1";
@@ -403,13 +403,14 @@ std::string Factorial(std::string op) { // todo : add threading operation
   while (op[0] == '0')
     op = op.substr(1);
 
-  std::string factorial = "1",
-              temp = "1",
-              increment = "1";
+  std::string factorial = op,
+              counter = op,
+              decrement = "1";
 
-  while (temp != op) {
-    temp = Add(temp, increment);
-    factorial = Multiply(factorial, temp);
+  counter = Subtract(counter, decrement);
+  while (counter != end) { // Count down to 1 from
+    factorial = Multiply(factorial, counter);
+    counter = Subtract(counter, decrement);
   }
 
   return factorial;
@@ -785,14 +786,14 @@ std::string Combination(std::string op1, std::string op2) {
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
     printf("Error! Invalid input.");
-    return "NaN";
+    return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
     printf("Error! Invalid input.");
-    return "NaN";
+    return "{}";
   }
 
   // Remove leading zeros
@@ -803,7 +804,7 @@ std::string Combination(std::string op1, std::string op2) {
 
   if (IsSmaller(op1, op2)) {
     printf("Error! Invalid input.");
-    return "NaN";
+    return "{}";
   }
 
   std::string numerator,
@@ -821,14 +822,14 @@ std::string Permutation(std::string op1, std::string op2) {
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
     printf("Error! Invalid input.");
-    return "NaN";
+    return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
     printf("Error! Invalid input.");
-    return "NaN";
+    return "{}";
   }
 
   // Remove leading zeros
@@ -839,15 +840,9 @@ std::string Permutation(std::string op1, std::string op2) {
 
   if (IsSmaller(op1, op2))
   {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input. N must be >= R.");
+    return "{}";
   }
 
-  std::string numerator,
-      denominator;
-
-  numerator = (Factorial(op1));
-  denominator = (Factorial(Subtract(op1, op2)));
-
-  return SimplifyFraction(numerator+"|"+denominator);
+  return SimplifyFraction((Factorial(op1, Subtract(op1, op2))));
 }
