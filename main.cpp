@@ -43,15 +43,21 @@ bool REPL(map<int, string> &expressions);
 
 int main()
 {
-    map<int, string> expressions;
-    introduction();
-    map<string, int> commands;
-    string line;
-    bool stored = false;
-    loadCommands(commands);
-    while(getLine(line))
-        process(line, commands, expressions, stored);
-    exit(line, expressions, stored);
+//    map<int, string> expressions;
+//    introduction();
+//    map<string, int> commands;
+//    string line;
+//    bool stored = false;
+//    loadCommands(commands);
+//    while(getLine(line))
+//        process(line, commands, expressions, stored);
+//    exit(line, expressions, stored);
+
+  while (1) {
+    std::string input;
+    while(!GetInput(input, "\nop: "));
+    std::cout << CommaSeparator(input) << std::endl;
+  }
 }
 
 void introduction()

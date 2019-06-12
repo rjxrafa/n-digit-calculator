@@ -9,7 +9,7 @@
 
 
 bool GetInput(std::string &input, std::string &&question);
-std::string CommaSeparator(const std::string &input);
+std::string CommaSeparator(std::string input);
 
 
 #endif //N_DIGIT_CALCULATOR__INPUT_H_
