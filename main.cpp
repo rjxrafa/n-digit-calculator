@@ -43,21 +43,15 @@ bool REPL(map<int, string> &expressions);
 
 int main()
 {
-//    map<int, string> expressions;
-//    introduction();
-//    map<string, int> commands;
-//    string line;
-//    bool stored = false;
-//    loadCommands(commands);
-//    while(getLine(line))
-//        process(line, commands, expressions, stored);
-//    exit(line, expressions, stored);
-
-  while (1) {
-    std::string input;
-    while(!GetInput(input, "\nop: "));
-    std::cout << CommaSeparator(input) << std::endl;
-  }
+    map<int, string> expressions;
+    introduction();
+    map<string, int> commands;
+    string line;
+    bool stored = false;
+    loadCommands(commands);
+    while(getLine(line))
+        process(line, commands, expressions, stored);
+    exit(line, expressions, stored);
 }
 
 void introduction()
@@ -806,7 +800,7 @@ void show(const string& suffix, map<int, string> expressions)
             if(expressions[int(suffix[0]) -65].empty())
                 cout << "This expression is empty" << endl;
             else {
-                cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
+                cout << suffix[0] << " = " << format_result(CommaSeparator(expressions[int(suffix[0]) -65])) << endl;
             }
         }
         else
@@ -839,7 +833,7 @@ void list(map<int, string>& expressions)
         {
             notempty = true;
             cout << char(i+65) << " = ";
-            cout << format_result(expressions[i]) << endl;
+            cout << format_result(CommaSeparator(expressions[i])) << endl;
         }
     }
 
@@ -892,6 +886,7 @@ void edit(const string& suffix, map<int, string>& expressions)
         cout << "Expression " << char(index+65) << " has been edited" << endl;
     }
 }
+
 /**
  * @brief empties maps
  * @param mySets
@@ -997,7 +992,7 @@ void save(const string &suffix, map<int, string> expressions, bool &stored)
     {
         //output if expression aren't empty
         if(!expressions[i].empty())
-            out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
+            out << char(i + 65) << " = " << format_result(CommaSeparator(expressions[i])) << endl;
     }
 
     std::cout << "Save successful." << std::endl;
@@ -1533,6 +1528,7 @@ bool loadPrecedence(map<char, int> &operators)
         return false;
     }
 }
+
 /**
  * This function displays a help menu to the console output stream.
  */

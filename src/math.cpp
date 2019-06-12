@@ -390,7 +390,7 @@ std::string Multiply(std::string op1, std::string op2) {
  */
 std::string Factorial(std::string op, std::string end) { // todo : add threading operation
 
-  if (op == "0")
+  if (op == "0" || op == "1")
     return "1";
 
   // Check for negatives and fractions
