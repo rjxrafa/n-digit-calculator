@@ -320,16 +320,26 @@ bool purgeSpacesAndFormat(string &line)
                 //clean more spaces
                 while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
-                if(!isdigit(line[j+1]))
+
+                if(isdigit(line[j+1]))
                 {
-                    cout << "Improper format for combination" << endl;
-                    return false;
+                    //get first number
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
                 }
-                //get first number
-                while (j + 1 < line.length() && isdigit(line[j+1]))
+                //if alphabet
+                else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                 {
                     j++;
                     temp += line[j];
+                }
+                else
+                {
+                    cout << "Improper format for combination" << endl;
+                    return false;
                 }
                 //add symbol for C
                 temp += '@';
@@ -343,16 +353,26 @@ bool purgeSpacesAndFormat(string &line)
                     while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
 
-                    if(!isdigit(line[j+1]))
+
+                    if(isdigit(line[j+1]))
                     {
-                        cout << "Improper format for combination" << endl;
-                        return false;
+                        //get second number
+                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        {
+                            j++;
+                            temp += line[j];
+                        }
                     }
-                    //get second number
-                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    //if alphabet
+                    else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                     {
                         j++;
                         temp += line[j];
+                    }
+                    else
+                    {
+                        cout << "Improper format for combination" << endl;
+                        return false;
                     }
 
                     //clean more spaces
@@ -398,19 +418,32 @@ bool purgeSpacesAndFormat(string &line)
                 //clean more spaces
                 while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
-                if(!isdigit(line[j+1]))
+
+                if(isdigit(line[j+1]))
                 {
-                    cout << "Improper format for permuation" << endl;
-                    return false;
+                    //get first number
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
                 }
-                //get first number
-                while (j + 1 < line.length() && isdigit(line[j+1]))
+                //if alphabet
+                else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                 {
                     j++;
                     temp += line[j];
                 }
+                else
+                {
+                    cout << "Improper format for permuation" << endl;
+                    return false;
+                }
+
                 //add symbol for C
                 temp += '#';
+
+
                 //clean more spaces
                 while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
@@ -421,16 +454,26 @@ bool purgeSpacesAndFormat(string &line)
                     while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
 
-                    if(!isdigit(line[j+1]))
+
+                    if(isdigit(line[j+1]))
                     {
-                        cout << "Improper format for permutation" << endl;
-                        return false;
+                        //get first number
+                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        {
+                            j++;
+                            temp += line[j];
+                        }
                     }
-                    //get second number
-                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    //if alphabet
+                    else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                     {
                         j++;
                         temp += line[j];
+                    }
+                    else
+                    {
+                        cout << "Improper format for permuation" << endl;
+                        return false;
                     }
 
                     //clean more spaces
@@ -483,16 +526,26 @@ bool purgeSpacesAndFormat(string &line)
                     //clean more spaces
                     while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
-                    if(!isdigit(line[j+1]))
+
+                    if(isdigit(line[j+1]))
                     {
-                        cout << "Improper format for GCD" << endl;
-                        return false;
+                        //get first number
+                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        {
+                            j++;
+                            temp += line[j];
+                        }
                     }
-                    //get first number
-                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    //if alphabet
+                    else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                     {
                         j++;
                         temp += line[j];
+                    }
+                    else
+                    {
+                        cout << "Improper format for GCD" << endl;
+                        return false;
                     }
                     //add symbol for C
                     temp += '$';
@@ -506,16 +559,26 @@ bool purgeSpacesAndFormat(string &line)
                         while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                             j++;
 
-                        if(!isdigit(line[j+1]))
+
+                        if(isdigit(line[j+1]))
                         {
-                            cout << "Improper format for GCD" << endl;
-                            return false;
+                            //get second number
+                            while (j + 1 < line.length() && isdigit(line[j+1]))
+                            {
+                                j++;
+                                temp += line[j];
+                            }
                         }
-                        //get second number
-                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        //if alphabet
+                        else if(line[j+1] >= 'A' && line[j+1] <= 'Z')
                         {
                             j++;
                             temp += line[j];
+                        }
+                        else
+                        {
+                            cout << "Improper format for GCD" << endl;
+                            return false;
                         }
 
                         //clean more spaces
@@ -1570,7 +1633,7 @@ string format_result(string result)
 {
     string temp = "";
     if(result.empty())
-        temp = "{}";
+        temp = "0";
     else {
         for(int i = 0; i < result.size(); ++i)
         {
