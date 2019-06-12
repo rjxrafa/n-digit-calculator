@@ -24,6 +24,7 @@ void executeCommand(const string &command, const string &suffix,
                     const map<string, int> &commands,
                     map<int, string>& expressions, bool &stored);
 void let(const string& suffix, map<int, string>& expressions);
+void is(const string& suffix, map<int, string> expressions);
 void edit(const string& suffix, map<int, string>& expressions);
 void show(const string& suffix, map<int, string> expressions);
 void list(map<int, string>& expressions);
@@ -32,15 +33,11 @@ void exit(const string &suffix, map<int, string> expressions, bool stored);
 void wexit(const string &suffix, map<int, string> expressions);
 void clear(map<int, string> &expressions);
 void load(const string &suffix, map<int, string>& expressions);
-void GCD(const string &suffix, map<int, string>& expressions);
-void Combinations(const string &suffix, map<int, string>& expressions);
-void Permutations(const string &suffix, map<int, string>& expressions);
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
 string format_result(string result);
 string formatRPN(string rpn);
-
 void help();
 bool REPL(map<int, string> &expressions);
 
@@ -88,6 +85,8 @@ void loadCommands(map<string, int> &commands)
     commands["WQUIT"] = 8;
     commands["CLEAR"] = 9;
     commands["REPL"]  = 10;
+    commands["IS"]  = 11;
+
 }
 
 /**
@@ -469,6 +468,9 @@ void executeCommand(const string &command, const string &suffix, const map<strin
     case 10:
         while (REPL(expressions));
         break;
+    case 11:
+        is(suffix, expressions);
+        break;
 
     default: cout << "Invalid command!" << endl;
     }
@@ -481,7 +483,7 @@ void executeCommand(const string &command, const string &suffix, const map<strin
  */
 void let(const string& suffix, map<int, string>& expressions)
 {
-    bool debug = true;
+    bool debug = false;
 
     stringstream ss(suffix);
     string infix;
@@ -538,6 +540,52 @@ void let(const string& suffix, map<int, string>& expressions)
     {
         cout << "Invalid Expression" << endl;
         return;
+    }
+}
+
+void is(const string& suffix, map<int, string> expressions)
+{
+    stringstream ss(suffix);
+    char op1, op2, op;
+    if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ<>=") < suffix.size() || suffix.size() != 3) {
+        cout << "Error, Invalid input" << endl;
+        return;
+    }
+    if(ss>>op1>>op>>op2)
+    {
+        if (!isalpha(op1) || !isalpha(op2)) {
+            cout << "Error, Invalid input" << endl;
+            return;
+        }
+        else if(expressions[int(op1) - 65].empty() || expressions[int(op2) - 65].empty())
+        {
+            cout << "Error, set is empty" << endl;
+            return;
+        }
+        switch(op)
+        {
+            case '<':
+                if(stringLesser(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " << op1 << " is less than " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not less than " << op2 << endl;
+                break;
+            case '>':
+                if(stringGreater(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " <<  op1 << " is greater than " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not greater than " << op2 << endl;
+                break;
+            case '=':
+                if(stringEquality(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " <<  op1 << " is equal to " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not equal to " << op2 << endl;
+                break;
+            default:
+                cout << "Error, invalid operator found" << endl;
+                return;
+        }
     }
 }
 

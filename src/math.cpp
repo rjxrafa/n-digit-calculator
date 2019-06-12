@@ -851,3 +851,60 @@ std::string Permutation(std::string op1, std::string op2) {
 
   return SimplifyFraction(numerator+"|"+denominator);
 }
+
+bool stringEquality(std::string op1, std::string op2)
+{
+    int i;
+    for(i = 0; i<op1.size(); ++i)
+    {
+        if(op1[i] != op2[i])
+            return false;
+    }
+    if(i < op2.size())
+        return false;
+    return true;
+}
+
+bool stringLesser(std::string op1, std::string op2)
+{
+    //check for empty
+    //check for negatives
+    bool bothNeg = false;
+    /** Handle negatives **/
+    if (op1[0] == '-') {
+      if (op2[0] == '-') {
+        bothNeg = true;
+        op1 = op1.substr(1);
+        op2 = op2.substr(1);
+
+      } else { // op1 (-), op2 (+)
+        return true;
+      }
+    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+      return false;
+    }
+    //check for fractions
+
+    //check for mixed
+
+}
+
+bool stringGreater(std::string op1, std::string op2)
+{
+    //check for negatives
+    bool bothNeg = false;
+    /** Handle negatives **/
+    if (op1[0] == '-') {
+      if (op2[0] == '-') {
+        bothNeg = true;
+        op1 = op1.substr(1);
+        op2 = op2.substr(1);
+
+      } else { // op1 (-), op2 (+)
+        return false;
+      }
+    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+      return true;
+    }
+
+}
