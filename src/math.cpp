@@ -395,8 +395,8 @@ std::string Factorial(std::string op) { // todo : add threading operation
 
   // Check for negatives and fractions
   if (op[0] == '-' || op.find('|') != std::string::npos || op.find('_') != std::string::npos) {
-    printf("Invalid input!");
-    return "NaN";
+    printf("Invalid input!\n");
+    return "{}";
   }
 
   // Remove leading zeros
@@ -449,8 +449,8 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (op1.empty())
     op1 = "0";
   if (op2.empty()) {
-    printf("Error! Division by zero.");
-    return "NaN";
+    printf("Error! Division by zero.\n");
+    return "{}";
   }
 
   if (op1 == op2) /** Identity Property **/
@@ -609,7 +609,7 @@ std::string GCD(std::string op1, std::string op2) {
 
   if (op2.empty() || op1.empty()) {
     printf("Divison by zero! Error.\n");
-    return "NaN";
+    return "{}";
   }
 
   if (IsSmaller(op1, op2))
@@ -784,15 +784,15 @@ std::string Combination(std::string op1, std::string op2) {
   if (op1.find('-') != std::string::npos ||
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input.\n");
+    return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input.\n");
+    return "{}";
   }
 
   // Remove leading zeros
@@ -802,8 +802,8 @@ std::string Combination(std::string op1, std::string op2) {
     op2 = op2.substr(1);
 
   if (IsSmaller(op1, op2)) {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! first entry must be larger.\n");
+    return "{}";
   }
 
   std::string numerator,
@@ -820,15 +820,15 @@ std::string Permutation(std::string op1, std::string op2) {
   if (op1.find('-') != std::string::npos ||
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input.\n");
+    return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input.\n");
+    return "{}";
   }
 
   // Remove leading zeros
@@ -839,8 +839,8 @@ std::string Permutation(std::string op1, std::string op2) {
 
   if (IsSmaller(op1, op2))
   {
-    printf("Error! Invalid input.");
-    return "NaN";
+    printf("Error! Invalid input.\n");
+    return "{}";
   }
 
   std::string numerator,
@@ -906,5 +906,4 @@ bool stringGreater(std::string op1, std::string op2)
     } else if (op2[0] == '-') { // op1 (+), op2 (-)
       return true;
     }
-
 }
