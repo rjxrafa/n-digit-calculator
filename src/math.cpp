@@ -507,7 +507,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (IsSmaller(op1, op2)) {
     if (negative)
       op1 = '-'+op1;
-    return op1 + "|"+ op2;
+    return SimplifyFraction(op1 + "|"+ op2);
   } else {
 
     /**
@@ -672,8 +672,7 @@ std::string SimplifyFraction(std::string op) {
 
   /** Check if operand is a mixed number **/
   if (op.find('_') != std::string::npos) {
-    ss >> mixed;
-    ss.get(); // Remove space
+    getline(ss, mixed, '_'); // Retrieve mixed
   }
 
   getline(ss, numerator, '|'); // Retrieve numerator & denominator

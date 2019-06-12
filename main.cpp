@@ -126,9 +126,33 @@ bool purgeSpaces(string &line)
     string formatted = "";
     bool validMixed = false;
     bool validSymb = false;
+    int fbad = 0;
+    int nbad = 0;
+    int dbad = 0;
+    int fcommas = 0;
+    int ncommas = 0;
+    int dcommas = 0;
+    int fdigits = 0;
+    int ndigits = 0;
+    int ddigits = 0;
+    bool fcomma = false;
+    bool ncomma = false;
+    bool dcomma = false;
     int j = 0;
     for (unsigned int i = 0; i < line.length(); ++i)
     {
+        fbad = 0;
+        nbad = 0;
+        dbad = 0;
+        fcommas = 0;
+        ncommas = 0;
+        dcommas = 0;
+        fdigits = 0;
+        ndigits = 0;
+        ddigits = 0;
+        fcomma = false;
+        ncomma = false;
+        dcomma = false;
         //skip tabs
         if(line[i] == '\t')
         {
@@ -139,11 +163,34 @@ bool purgeSpaces(string &line)
         if ((isdigit(line[i])))
         {
             formatted += line[i];
+            fdigits++;
             //continues accepting numbers
-            while (i + 1 < line.length() && isdigit(line[i+1]))
+            while (i + 1 < line.length() && (isdigit(line[i+1])||line[i+1] == ','))
             {
-                i++;
-                formatted += line[i];
+                if(line[i+1] == ',')
+                {
+                    fcomma = true;
+                    i++;
+                    fcommas++;
+                }
+                else {
+                    if(fcomma)
+                    {
+                        fbad++;
+                        if(fbad == 3)
+                        {
+                            fbad = 0;
+                        }
+                    }
+                    fdigits++;
+                    i++;
+                    formatted += line[i];
+                }
+            }
+            if(fcomma && (fdigits - fcommas < (2*fcommas + 1) || fdigits - fcommas > (2*fcommas + 3) || fbad != 0))
+            {
+                cout << "Invalid commas: check position or amount of commas to digits" << endl;
+                return false;
             }
             //possible mixed number
             if(i+1 < line.length() && (line[i+1] == ' ' || line[i+1] == '\t'))
@@ -156,21 +203,42 @@ bool purgeSpaces(string &line)
                 j = i;
                 //if we find anything but a digit, get out
                 if(!isdigit(line[i+1]))
+                {
                     continue;
+                }
                 //if we find an op get out
                 //check if mixed number
                 if(j+1 < line.length() && isdigit(line[j+1]))
                 {
                     temp += '_';
                     //keep taking digits
-                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    while (j + 1 < line.length() && (isdigit(line[j+1]) || line[j+1] == ','))
                     {
-                        j++;
-                        temp += line[j];
+                        if(line[j+1] == ',')
+                        {
+                            ncomma = true;
+                            j++;
+                            ncommas++;
+                        }
+                        else {
+                            if(ncomma)
+                            {
+                                nbad++;
+                                if(nbad == 3)
+                                {
+                                    nbad = 0;
+                                }
+                            }
+                            ndigits++;
+                            j++;
+                            temp += line[j];
+                        }
                     }
                     //take white spaaces
                     while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
+
+                    //fraction part
                     if(j+1 < line.length() && line[j+1] == '/')
                     {
                         temp += '|';
@@ -182,16 +250,48 @@ bool purgeSpaces(string &line)
                             cout << "Improper mixed number" << endl;
                             return false;
                         }
-                        while (j + 1 < line.length() && isdigit(line[j+1]))
+                        while (j + 1 < line.length() && (isdigit(line[j+1]) || line[j+1] == ','))
                         {
-                            validMixed = true;
-                            j++;
-                            temp += line[j];
+                            if(line[j+1] == ',')
+                            {
+                                dcomma = true;
+                                validMixed = false;
+                                j++;
+                                dcommas++;
+                            }
+                            else {
+                                if(dcomma)
+                                {
+                                    dbad++;
+                                    if(dbad == 3)
+                                    {
+                                        dbad = 0;
+                                    }
+                                }
+                                validMixed = true;
+                                ddigits++;
+                                j++;
+                                temp += line[j];
+                            }
                         }
-                        if(validMixed)
+                        if(ncomma && (ndigits - ncommas < (2*ncommas + 1) || ndigits - ncommas > (2*ncommas + 3) || nbad != 0))
+                        {
+                            cout << "Invalid amount of decimals to digits" << endl;
+                            return false;
+                        }
+                        if(dcomma && (ddigits - dcommas < (2*dcommas + 1) || ddigits - dcommas > (2*dcommas + 3) || dbad != 0))
+                        {
+                            cout << "Invalid amount of decimals to digits" << endl;
+                            return false;
+                        }
+                        else if(validMixed)
                         {
                             i = j;
                             formatted += temp;
+                        }
+                        else {
+                            cout << "Improper mixed number" << endl;
+                            return false;
                         }
                     }
                     else {
@@ -453,7 +553,7 @@ bool purgeSpaces(string &line)
             }
         }
         //takes in letters
-        else if(line[i] != ' ')
+        else if(line[i] != ' ' && line[i] != ',')
         {
             formatted += line[i];
         }
@@ -607,10 +707,10 @@ void let(const string& suffix, map<int, string>& expressions)
         {
 
             if(debug){cout << "Postfix ->: " << formatRPN(postfix) << endl;}
-            //            if(invalidInput(postfix))
-            //            {
-            //                return;
-            //            }
+//            if(invalidInput(postfix))
+//            {
+//                return;
+//            }
             if(!rpnEval(postfix).empty())
                 expressions[int(index) - 65] = rpnEval(postfix);
         }
@@ -1236,7 +1336,10 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
     for (size_t i = operatorStack.length() - 1; i != string::npos; --i)
     {
         if(operatorStack[i] == '(')
+        {
+            cout << "Mismatched Parenthesis" << endl;
             return false;
+        }
         outputQueue += operatorStack[i];
         outputQueue += " ";
         operatorStack.pop_back();
@@ -1274,6 +1377,7 @@ string rpnEval(const string& postfix)
                 numbers+= postfix[i+1];
                 i++;
             }
+            numbers = SimplifyFraction(numbers);
             outputStack.push_back(numbers);
         }
         else
@@ -1379,6 +1483,11 @@ string rpnEval(const string& postfix)
                 if(result == "{}")
                     return "";
                 outputStack.push_back(result);
+                break;
+            case '(':
+            case ')':
+                cout << "Mismatched Parenthesis" << endl;
+                return "";
                 break;
             default:
                 break;
