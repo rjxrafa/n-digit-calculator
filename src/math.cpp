@@ -492,7 +492,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
       if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
         op1 = Add(Multiply(op1_mixed, op1_denominator), op1);
       if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
-        op2 = Add(Multiply(op1_mixed, op2_denominator), op2);
+        op2 = Add(Multiply(op2_mixed, op2_denominator), op2);
 
       if (negative)
         op1 = '-'+op1;
