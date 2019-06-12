@@ -579,7 +579,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-/|_") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-^/|_") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
@@ -611,7 +611,8 @@ void let(const string& suffix, map<int, string>& expressions)
             //            {
             //                return;
             //            }
-            expressions[int(index) - 65] = rpnEval(postfix);
+            if(!rpnEval(postfix).empty())
+                expressions[int(index) - 65] = rpnEval(postfix);
         }
         return;
     }
@@ -691,7 +692,11 @@ void show(const string& suffix, map<int, string> expressions)
     {
         if(int(suffix[0]-65) < expressions.size())
         {
-            cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
+            if(expressions[int(suffix[0]) -65].empty())
+                cout << "This expression is empty" << endl;
+            else {
+                cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
+            }
         }
         else
         {
@@ -709,16 +714,27 @@ void list(map<int, string>& expressions)
 {
     bool debug = true;
 
+    bool notempty = false;
+
     //if no expression have been entered throw error
     if (expressions.empty()) {
         cout << "Error, no expressions have been entered" << endl;
         return;
     }
 
-    for(int i = 0; i < expressions.size(); ++i) {
-        cout << char(i+65) << " = ";
-        cout << format_result(expressions[i]) << endl;
+    for(int i = 0; i < expressions.size(); ++i)
+    {
+        if(!expressions[i].empty())
+        {
+            notempty = true;
+            cout << char(i+65) << " = ";
+            cout << format_result(expressions[i]) << endl;
+        }
     }
+
+    if(!notempty)
+        cout << "Error, no expressions have been entered" << endl;
+
 }
 
 //cannot have two ops or operands in a row
@@ -867,7 +883,11 @@ void save(const string &suffix, map<int, string> expressions, bool &stored)
     }
 
     for(int i = 0; i < expressions.size(); ++i)
-        out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
+    {
+        //output if expression aren't empty
+        if(!expressions[i].empty())
+            out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
+    }
 
     std::cout << "Save successful." << std::endl;
 
@@ -887,12 +907,17 @@ void load(const string &suffix, map<int, string>& expressions)
     if((in.fail())) {
         std::cout << "The input file does not exist!" << std::endl;
     } else {
+        cout << endl;
         while (getline(in, line)) {
+            cout << "let " << line << endl;
             trimLineAndStandardize(line);
             if(purgeSpaces(line))
                 let(line, expressions);
         }
+        cout << endl;
         std::cout << "The file \"" << filename << "\" was loaded! \n";
+        cout << endl;
+
     }
     out.close();
     in.close();
@@ -929,7 +954,8 @@ string formatInfix(string input)
                 formatted += input[i];
                 while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                       && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                      && input[i+1] != '^')
                 {
                     i++;
                     formatted += input[i];
@@ -954,7 +980,8 @@ string formatInfix(string input)
                 formatted += input[i];
                 while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                       && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                      && input[i+1] != '^')
                 {
                     i++;
                     formatted += input[i];
@@ -965,7 +992,7 @@ string formatInfix(string input)
 
         //-123
         else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/'
-                 || input[i] == '@' || input[i] == '#' || input[i] == '$')
+                 || input[i] == '@' || input[i] == '#' || input[i] == '$' || input[i] == '^')
         {
             formatted += input[i];
             formatted += " ";
@@ -1000,7 +1027,8 @@ string formatInfix(string input)
                     formatted += input[i];
                     while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                           && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                          && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                          && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                          && input[i+1] != '^')
                     {
                         i++;
                         formatted += input[i];
@@ -1039,13 +1067,26 @@ string formatInfix(string input)
                         formatted += input[i];
                         while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                               && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                              && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                              && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                              && input[i+1] != '^')
                         {
                             i++;
                             formatted += input[i];
                         }
                     }
                     formatted+= " ";
+                }
+                else if( i+2 < input.length() && input[i+2] >= 'A' && input[i+2] <= 'Z')
+                {
+                    if(input[i+1] == '-')
+                    {
+                        formatted += '~';
+                        formatted += " ";
+                    }
+                    formatted += input[i+2];
+                    formatted += " ";
+                    i++;
+                    i++;
                 }
                 else if(i+2 < input.length() && input[i+2] == '(')
                 {
@@ -1086,7 +1127,6 @@ string formatInfix(string input)
             formatted += input[i];
             formatted += " ";
         }
-
 
         //throw error
     }
@@ -1136,16 +1176,23 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         else if(expression[i] >= 'A' && expression[i] <= 'Z')
         {
             string operand = "";
-            operand += expressions[int(expression[i]) - 65];
-            operand += " ";
+            if(expressions[int(expression[i]) - 65].empty())
+            {
+                cout << "Error. An empty set was entered" << endl;
+                return false;
+            }
+            else {
+                operand += expressions[int(expression[i]) - 65];
+                operand += " ";
 
-            //puts space to indicate digit
-            outputQueue += operand;
+                //puts space to indicate digit
+                outputQueue += operand;
+            }
         }
 
         else if (op.count(expression[i]))
         {
-            if(expression[i] == '~' || expression[i] == '!')
+            if(expression[i] == '~')
             {
                 operatorStack.push_back(expression[i]);
                 continue;
@@ -1234,6 +1281,16 @@ string rpnEval(const string& postfix)
             string first, second, result;
             switch(postfix[i])
             {
+            case '^':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Power(second, first);
+                if(result == "{}")
+                    return "";
+                outputStack.push_back(result);
+                break;
             //combination
             case '@':
                 first = outputStack.back();
@@ -1241,6 +1298,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Combination(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             //permutation
@@ -1250,6 +1309,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Permutation(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             //GCD
@@ -1259,18 +1320,24 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = GCD(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '!':
                 first = outputStack.back();
                 outputStack.pop_back();
                 result = Factorial(first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '~':
                 first = outputStack.back();
                 outputStack.pop_back();
                 result = Negate(first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '+':
@@ -1279,6 +1346,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Add(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '-':
@@ -1287,6 +1356,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Subtract(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '*':
@@ -1295,6 +1366,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Multiply(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '/':
@@ -1303,6 +1376,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Divide(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             default:
@@ -1323,11 +1398,12 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
-        operators['@'] = 3;
-        operators['#'] = 3;
-        operators['$'] = 3;
+        operators['@'] = 6;
+        operators['#'] = 6;
+        operators['$'] = 6;
+        operators['^'] = 5;
+        operators['~'] = 4;
         operators['!'] = 3;
-        operators['~'] = 3;
         operators['*'] = 2;
         operators['/'] = 2;
         operators['+'] = 1;
