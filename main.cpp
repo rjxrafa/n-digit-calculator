@@ -17,7 +17,7 @@ bool getLine(string &line);
 void process(string &line, const map<string, int> &commands,
              map<int, string>& expressions, bool &stored);
 void trimLineAndStandardize(string &line);
-bool purgeSpaces(string &line);
+bool purgeSpacesAndFormat(string &line);
 string formatInfix(string input);
 void findCommand(string line, string &command, string &suffix);
 void executeCommand(const string &command, const string &suffix,
@@ -117,10 +117,10 @@ void trimLineAndStandardize(string &line)
 
 /**
  * This function removes all spaces from a given string
- * also formats mixed numbers, gcd,
+ * also formats mixed numbers, gcd, functions
  * @param suffix
  */
-bool purgeSpaces(string &line)
+bool purgeSpacesAndFormat(string &line)
 {
     std::string temp = "";
     string formatted = "";
@@ -553,6 +553,11 @@ bool purgeSpaces(string &line)
             }
         }
         //takes in letters
+        else if(line[i] == ',')
+        {
+            cout << "Improper position for comma" << endl;
+            return false;
+        }
         else if(line[i] != ' ' && line[i] != ',')
         {
             formatted += line[i];
@@ -595,7 +600,7 @@ void process(string &line, const map<string, int> &commands,
     if(command != "EXIT") {
         stored = false;
     }
-    if(purgeSpaces(suffix))
+    if(purgeSpacesAndFormat(suffix))
         executeCommand(command, suffix, commands, expressions, stored);
     else
     {
@@ -861,7 +866,7 @@ void edit(const string& suffix, map<int, string>& expressions)
         cout << "Enter new expression: ";
         getline(cin, line);
         trimLineAndStandardize(line);
-        purgeSpaces(line);
+        purgeSpacesAndFormat(line);
 
         if (line.empty())
         {
@@ -1011,7 +1016,7 @@ void load(const string &suffix, map<int, string>& expressions)
         while (getline(in, line)) {
             cout << "let " << line << endl;
             trimLineAndStandardize(line);
-            if(purgeSpaces(line))
+            if(purgeSpacesAndFormat(line))
                 let(line, expressions);
         }
         cout << endl;
@@ -1597,7 +1602,7 @@ bool REPL(map<int, string> &expressions) {
             return false;
         }
 
-        purgeSpaces(input);
+        purgeSpacesAndFormat(input);
 
 
         if (shuntingYard(input, postfix, expressions))
