@@ -61,7 +61,7 @@ while(1)
     std::string op2 = "3";
     while(!GetInput(op1, "op1: "));
     while(!GetInput(op2, "op2: "));
-    std::cout << Permutation(op1,op2) << std::endl;}
+    std::cout << Divide(op1,op2) << std::endl;}
     return 0;
 }
 
