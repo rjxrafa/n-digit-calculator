@@ -745,19 +745,19 @@ void is(const string& suffix, map<int, string> expressions)
         switch(op)
         {
             case '<':
-                if(stringLesser(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(LessThan(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " << op1 << " is less than " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not less than " << op2 << endl;
                 break;
             case '>':
-                if(stringGreater(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(GreaterThan(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " <<  op1 << " is greater than " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not greater than " << op2 << endl;
                 break;
             case '=':
-                if(stringEquality(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(EqualTo(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " <<  op1 << " is equal to " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not equal to " << op2 << endl;

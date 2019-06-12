@@ -24,9 +24,9 @@ std::string FractionToDecimal(const std::string &op1);
 std::string SquareRoot(const std::string &op);
 std::string Combination(std::string op1, std::string op2);
 std::string Permutation(std::string op1, std::string op2);
-bool stringEquality(std::string op1, std::string op2);
-bool stringLesser(std::string op1, std::string op2);
-bool stringGreater(std::string op1, std::string op2);
+bool EqualTo(std::string op1, std::string op2);
+bool LessThan(std::string op1, std::string op2);
+bool GreaterThan(std::string op1, std::string op2);
 
 
 #endif //N_DIGIT_CALCULATOR_SRC_ADD_H_

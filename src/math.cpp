@@ -724,9 +724,6 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
     op2 = op2.substr(1);
   }
 
-  if (op1.empty() || op2.empty())
-    return;
-
   std::string op1_mixed,
               op1_numerator,
               op1_denominator;
@@ -847,58 +844,73 @@ std::string Permutation(std::string op1, std::string op2) {
   return SimplifyFraction((Factorial(op1, Subtract(op1, op2))));
 }
 
-bool stringEquality(std::string op1, std::string op2)
-{
-    int i;
-    for(i = 0; i<op1.size(); ++i)
-    {
-        if(op1[i] != op2[i])
-            return false;
-    }
-    if(i < op2.size())
-        return false;
-    return true;
-}
+bool EqualTo(std::string op1, std::string op2) {
 
-bool stringLesser(std::string op1, std::string op2)
-{
-    //check for empty
-    //check for negatives
-    bool bothNeg = false;
-    /** Handle negatives **/
-    if (op1[0] == '-') {
-      if (op2[0] == '-') {
-        bothNeg = true;
-        op1 = op1.substr(1);
-        op2 = op2.substr(1);
+  NormalizeFractions(op1,op2);
 
-      } else { // op1 (-), op2 (+)
-        return true;
-      }
-    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+  int i;
+
+  for(i = 0; i < op1.size(); ++i)
+    if(op1[i] != op2[i])
       return false;
-    }
-    //check for fractions
 
-    //check for mixed
-
+  return i == op2.size();
 }
 
-bool stringGreater(std::string op1, std::string op2)
-{
-    //check for negatives
-    bool bothNeg = false;
-    /** Handle negatives **/
-    if (op1[0] == '-') {
-      if (op2[0] == '-') {
-        bothNeg = true;
-        op1 = op1.substr(1);
-        op2 = op2.substr(1);
+bool LessThan(std::string op1, std::string op2) {
 
-      } else { // op1 (-), op2 (+)
-        return false;
-      }
-    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+  NormalizeFractions(op1,op2);
+  /** Handle negatives **/
+  bool negative = false; // If both are negative, invert results
+  if (op1[0] == '-') { // If op1 is negative and op2 is not negative, return true
+    if (op2[0] != '-') {
       return true;
     }
+    op1 = op1.substr(0); // Trim negatives for next step
+    op2 = op2.substr(0);
+    negative = true;
+  } else if (op2[0] == '-') // if op2 is negative and op1 is positive, return false
+    return false;
+
+  if (op1 == op2)
+    return false;
+
+  std::string op1_numerator, op2_numerator;
+  std::stringstream ss(op1);
+  getline(ss, op1_numerator, '|');
+  ss.clear();
+  ss.str(op2);
+  getline(ss, op2_numerator, '|');
+
+  return (negative) ? (!IsSmaller(op1_numerator, op2_numerator)) :
+                      (IsSmaller(op1_numerator, op2_numerator));
+}
+
+bool GreaterThan(std::string op1, std::string op2)
+{
+  NormalizeFractions(op1,op2);
+  /** Handle negatives **/
+  bool negative = false; // If both are negative, invert results
+  if (op1[0] == '-') { // If op1 is negative and op2 is not negative, return false
+    if (op2[0] != '-') {
+      return false;
+    }
+    op1 = op1.substr(0); // Trim negatives for next step
+    op2 = op2.substr(0);
+    negative = true;
+  } else if (op2[0] == '-') // if op2 is negative and op1 is positive, return false
+    return true;
+
+  if (op1 == op2)
+    return false;
+
+  std::string op1_numerator, op2_numerator;
+  std::stringstream ss(op1);
+  getline(ss, op1_numerator, '|');
+  ss.clear();
+  ss.str(op2);
+  getline(ss, op2_numerator, '|');
+
+  return (negative) ? (IsSmaller(op1_numerator, op2_numerator)) :
+         (!IsSmaller(op1_numerator, op2_numerator));
 }
