@@ -17,13 +17,14 @@ bool getLine(string &line);
 void process(string &line, const map<string, int> &commands,
              map<int, string>& expressions, bool &stored);
 void trimLineAndStandardize(string &line);
-void purgeSpaces(string &line);
+bool purgeSpaces(string &line);
 string formatInfix(string input);
 void findCommand(string line, string &command, string &suffix);
 void executeCommand(const string &command, const string &suffix,
                     const map<string, int> &commands,
                     map<int, string>& expressions, bool &stored);
 void let(const string& suffix, map<int, string>& expressions);
+void is(const string& suffix, map<int, string> expressions);
 void edit(const string& suffix, map<int, string>& expressions);
 void show(const string& suffix, map<int, string> expressions);
 void list(map<int, string>& expressions);
@@ -32,15 +33,11 @@ void exit(const string &suffix, map<int, string> expressions, bool stored);
 void wexit(const string &suffix, map<int, string> expressions);
 void clear(map<int, string> &expressions);
 void load(const string &suffix, map<int, string>& expressions);
-void GCD(const string &suffix, map<int, string>& expressions);
-void Combinations(const string &suffix, map<int, string>& expressions);
-void Permutations(const string &suffix, map<int, string>& expressions);
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
 string format_result(string result);
 string formatRPN(string rpn);
-
 void help();
 bool REPL(map<int, string> &expressions);
 
@@ -88,6 +85,8 @@ void loadCommands(map<string, int> &commands)
     commands["WQUIT"] = 8;
     commands["CLEAR"] = 9;
     commands["REPL"]  = 10;
+    commands["IS"]  = 11;
+
 }
 
 /**
@@ -121,15 +120,39 @@ void trimLineAndStandardize(string &line)
  * also formats mixed numbers, gcd,
  * @param suffix
  */
-void purgeSpaces(string &line)
+bool purgeSpaces(string &line)
 {
     std::string temp = "";
     string formatted = "";
     bool validMixed = false;
     bool validSymb = false;
+    int fbad = 0;
+    int nbad = 0;
+    int dbad = 0;
+    int fcommas = 0;
+    int ncommas = 0;
+    int dcommas = 0;
+    int fdigits = 0;
+    int ndigits = 0;
+    int ddigits = 0;
+    bool fcomma = false;
+    bool ncomma = false;
+    bool dcomma = false;
     int j = 0;
     for (unsigned int i = 0; i < line.length(); ++i)
     {
+        fbad = 0;
+        nbad = 0;
+        dbad = 0;
+        fcommas = 0;
+        ncommas = 0;
+        dcommas = 0;
+        fdigits = 0;
+        ndigits = 0;
+        ddigits = 0;
+        fcomma = false;
+        ncomma = false;
+        dcomma = false;
         //skip tabs
         if(line[i] == '\t')
         {
@@ -140,55 +163,140 @@ void purgeSpaces(string &line)
         if ((isdigit(line[i])))
         {
             formatted += line[i];
+            fdigits++;
             //continues accepting numbers
-            while (i + 1 < line.length() && isdigit(line[i+1]))
+            while (i + 1 < line.length() && (isdigit(line[i+1])||line[i+1] == ','))
             {
-                i++;
-                formatted += line[i];
+                if(line[i+1] == ',')
+                {
+                    fcomma = true;
+                    i++;
+                    fcommas++;
+                }
+                else {
+                    if(fcomma)
+                    {
+                        fbad++;
+                        if(fbad == 3)
+                        {
+                            fbad = 0;
+                        }
+                    }
+                    fdigits++;
+                    i++;
+                    formatted += line[i];
+                }
             }
-            //possible fraction
-            if(i+1 < line.length() && line[i+1] == '/')
+            if(fcomma && (fdigits - fcommas < (2*fcommas + 1) || fdigits - fcommas > (2*fcommas + 3) || fbad != 0))
             {
-                j = i+1;
-
+                cout << "Invalid commas: check position or amount of commas to digits" << endl;
+                return false;
             }
             //possible mixed number
-            else if(i+1 < line.length() && line[i+1] == ' ')
+            if(i+1 < line.length() && (line[i+1] == ' ' || line[i+1] == '\t'))
             {
                 //skip that white space
                 i++;
-
                 //skip remaining white spaces
-                while(i+1 < line.length() && line[i+1] == ' ')
+                while(i+1 < line.length() && (line[i+1] == ' ' || line[i+1] == '\t'))
                     i++;
-
                 j = i;
+                //if we find anything but a digit, get out
+                if(!isdigit(line[i+1]))
+                {
+                    continue;
+                }
+                //if we find an op get out
                 //check if mixed number
                 if(j+1 < line.length() && isdigit(line[j+1]))
                 {
                     temp += '_';
                     //keep taking digits
-                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    while (j + 1 < line.length() && (isdigit(line[j+1]) || line[j+1] == ','))
                     {
-                        j++;
-                        temp += line[j];
+                        if(line[j+1] == ',')
+                        {
+                            ncomma = true;
+                            j++;
+                            ncommas++;
+                        }
+                        else {
+                            if(ncomma)
+                            {
+                                nbad++;
+                                if(nbad == 3)
+                                {
+                                    nbad = 0;
+                                }
+                            }
+                            ndigits++;
+                            j++;
+                            temp += line[j];
+                        }
                     }
-                    //if fraction
+                    //take white spaaces
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
+                        j++;
+
+                    //fraction part
                     if(j+1 < line.length() && line[j+1] == '/')
                     {
                         temp += '|';
                         j++;
-                        while (j + 1 < line.length() && isdigit(line[j+1]))
-                        {
-                            validMixed = true;
+                        while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                             j++;
-                            temp += line[j];
+                        if(!isdigit(line[j+1]))
+                        {
+                            cout << "Improper mixed number" << endl;
+                            return false;
                         }
-                        if(validMixed)
+                        while (j + 1 < line.length() && (isdigit(line[j+1]) || line[j+1] == ','))
+                        {
+                            if(line[j+1] == ',')
+                            {
+                                dcomma = true;
+                                validMixed = false;
+                                j++;
+                                dcommas++;
+                            }
+                            else {
+                                if(dcomma)
+                                {
+                                    dbad++;
+                                    if(dbad == 3)
+                                    {
+                                        dbad = 0;
+                                    }
+                                }
+                                validMixed = true;
+                                ddigits++;
+                                j++;
+                                temp += line[j];
+                            }
+                        }
+                        if(ncomma && (ndigits - ncommas < (2*ncommas + 1) || ndigits - ncommas > (2*ncommas + 3) || nbad != 0))
+                        {
+                            cout << "Invalid amount of decimals to digits" << endl;
+                            return false;
+                        }
+                        if(dcomma && (ddigits - dcommas < (2*dcommas + 1) || ddigits - dcommas > (2*dcommas + 3) || dbad != 0))
+                        {
+                            cout << "Invalid amount of decimals to digits" << endl;
+                            return false;
+                        }
+                        else if(validMixed)
                         {
                             i = j;
                             formatted += temp;
                         }
+                        else {
+                            cout << "Improper mixed number" << endl;
+                            return false;
+                        }
+                    }
+                    else {
+                        cout << "Invalid Input" << endl;
+                        return false;
                     }
                     temp = "";
                 }
@@ -203,14 +311,21 @@ void purgeSpaces(string &line)
         {
             //check if combination
             j = i;
-            while(j+1 < line.length() && line[j+1] == ' ')
+            //skip remaining white spaces
+            while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                 j++;
+            //combination indicator
             if(j+1 < line.length() && line[j+1] == '(')
             {
                 j++;
                 //clean more spaces
-                while(j+1 < line.length() && line[j+1] == ' ')
+                while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
+                if(!isdigit(line[j+1]))
+                {
+                    cout << "Improper format for combination" << endl;
+                    return false;
+                }
                 //get first number
                 while (j + 1 < line.length() && isdigit(line[j+1]))
                 {
@@ -220,15 +335,20 @@ void purgeSpaces(string &line)
                 //add symbol for C
                 temp += '@';
                 //clean more spaces
-                while(j+1 < line.length() && line[j+1] == ' ')
+                while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
                 if(j+1 < line.length() && line[j+1] == ',')
                 {
                     j++;
                     //clean more spaces
-                    while(j+1 < line.length() && line[j+1] == ' ')
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
 
+                    if(!isdigit(line[j+1]))
+                    {
+                        cout << "Improper format for combination" << endl;
+                        return false;
+                    }
                     //get second number
                     while (j + 1 < line.length() && isdigit(line[j+1]))
                     {
@@ -237,7 +357,7 @@ void purgeSpaces(string &line)
                     }
 
                     //clean more spaces
-                    while(j+1 < line.length() && line[j+1] == ' ')
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
                     if(j+1 < line.length() && line[j+1] == ')')
                     {
@@ -249,7 +369,15 @@ void purgeSpaces(string &line)
                         i = j;
                         formatted += temp;
                     }
+                    else {
+                        cout << "Improper format for combination" << endl;
+                        return false;
+                    }
                     temp = "";
+                }
+                else {
+                    cout << "Improper format for combination" << endl;
+                    return false;
                 }
             }
             else {
@@ -259,16 +387,23 @@ void purgeSpaces(string &line)
         //FOR PERMUTATION
         else if(line[i] == 'P')
         {
-            //check if combination
+            //check if permutation
             j = i;
-            while(j+1 < line.length() && line[j+1] == ' ')
+            //skip remaining white spaces
+            while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                 j++;
+            //combination indicator
             if(j+1 < line.length() && line[j+1] == '(')
             {
                 j++;
                 //clean more spaces
-                while(j+1 < line.length() && line[j+1] == ' ')
+                while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
+                if(!isdigit(line[j+1]))
+                {
+                    cout << "Improper format for permuation" << endl;
+                    return false;
+                }
                 //get first number
                 while (j + 1 < line.length() && isdigit(line[j+1]))
                 {
@@ -278,15 +413,20 @@ void purgeSpaces(string &line)
                 //add symbol for C
                 temp += '#';
                 //clean more spaces
-                while(j+1 < line.length() && line[j+1] == ' ')
+                while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                     j++;
                 if(j+1 < line.length() && line[j+1] == ',')
                 {
                     j++;
                     //clean more spaces
-                    while(j+1 < line.length() && line[j+1] == ' ')
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
 
+                    if(!isdigit(line[j+1]))
+                    {
+                        cout << "Improper format for permutation" << endl;
+                        return false;
+                    }
                     //get second number
                     while (j + 1 < line.length() && isdigit(line[j+1]))
                     {
@@ -295,7 +435,7 @@ void purgeSpaces(string &line)
                     }
 
                     //clean more spaces
-                    while(j+1 < line.length() && line[j+1] == ' ')
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                         j++;
                     if(j+1 < line.length() && line[j+1] == ')')
                     {
@@ -307,8 +447,19 @@ void purgeSpaces(string &line)
                         i = j;
                         formatted += temp;
                     }
+                    else {
+                        cout << "Improper format for permutation" << endl;
+                        return false;
+                    }
                     temp = "";
                 }
+                else {
+                    cout << "Improper format for permutation" << endl;
+                    return false;
+                }
+            }
+            else {
+                formatted += line[i];
             }
         }
         //for GCD
@@ -317,75 +468,98 @@ void purgeSpaces(string &line)
             //clean spaces and tabs around here
             //check if combination
             j = i;
-            while(j+1 < line.length() && line[j+1] == ' ')
+            while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                 j++;
             if(j+1 < line.length() && line[j+1] == 'C')
             {
                 j++;
+                while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
+                    j++;
                 if(j+1 < line.length() && line[j+1] == 'D')
                 {
                     j++;
                     while(j+1 < line.length() && line[j+1] == ' ')
                         j++;
-                    if(j+1 < line.length() && line[j+1] == '(')
+                    j++;
+                    //clean more spaces
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
+                        j++;
+                    if(!isdigit(line[j+1]))
+                    {
+                        cout << "Improper format for GCD" << endl;
+                        return false;
+                    }
+                    //get first number
+                    while (j + 1 < line.length() && isdigit(line[j+1]))
+                    {
+                        j++;
+                        temp += line[j];
+                    }
+                    //add symbol for C
+                    temp += '$';
+                    //clean more spaces
+                    while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
+                        j++;
+                    if(j+1 < line.length() && line[j+1] == ',')
                     {
                         j++;
                         //clean more spaces
-                        while(j+1 < line.length() && line[j+1] == ' ')
+                        while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                             j++;
-                        //get first number
+
+                        if(!isdigit(line[j+1]))
+                        {
+                            cout << "Improper format for GCD" << endl;
+                            return false;
+                        }
+                        //get second number
                         while (j + 1 < line.length() && isdigit(line[j+1]))
                         {
                             j++;
                             temp += line[j];
                         }
-                        //add symbol for C
-                        temp += '$';
+
                         //clean more spaces
-                        while(j+1 < line.length() && line[j+1] == ' ')
+                        while(j+1 < line.length() && (line[j+1] == ' ' || line[j+1] == '\t'))
                             j++;
-                        if(j+1 < line.length() && line[j+1] == ',')
+                        if(j+1 < line.length() && line[j+1] == ')')
                         {
                             j++;
-                            //clean more spaces
-                            while(j+1 < line.length() && line[j+1] == ' ')
-                                j++;
-
-                            //get second number
-                            while (j + 1 < line.length() && isdigit(line[j+1]))
-                            {
-                                j++;
-                                temp += line[j];
-                            }
-
-                            //clean more spaces
-                            while(j+1 < line.length() && line[j+1] == ' ')
-                                j++;
-                            if(j+1 < line.length() && line[j+1] == ')')
-                            {
-                                j++;
-                                validSymb = true;
-                            }
-                            if(validSymb = true)
-                            {
-                                i = j;
-                                formatted += temp;
-                            }
-                            temp = "";
+                            validSymb = true;
                         }
+                        if(validSymb = true)
+                        {
+                            i = j;
+                            formatted += temp;
+                        }
+                        else {
+                            cout << "Improper format for GCD" << endl;
+                            return false;
+                        }
+                        temp = "";
+                    }
+                    else {
+                        cout << "Improper format for GCD" << endl;
+                        return false;
                     }
                 }
+                else {
+                    cout << "Improper format for GCD" << endl;
+                    return false;
+                }
             }
-            else
-                cout << line[j+1];
+            else {
+                formatted += line[i];
+            }
         }
         //takes in letters
-        else if(line[i] != ' ')
+        else if(line[i] != ' ' && line[i] != ',')
         {
             formatted += line[i];
         }
     }
     line = formatted;
+    return true;
 }
 
 /**
@@ -421,9 +595,13 @@ void process(string &line, const map<string, int> &commands,
     if(command != "EXIT") {
         stored = false;
     }
-    purgeSpaces(suffix);
-//    cout << suffix << endl;
-    executeCommand(command, suffix, commands, expressions, stored);
+    if(purgeSpaces(suffix))
+        executeCommand(command, suffix, commands, expressions, stored);
+    else
+    {
+
+        return;
+    }
 }
 
 void executeCommand(const string &command, const string &suffix, const map<string, int> &commands,
@@ -469,6 +647,9 @@ void executeCommand(const string &command, const string &suffix, const map<strin
     case 10:
         while (REPL(expressions));
         break;
+    case 11:
+        is(suffix, expressions);
+        break;
 
     default: cout << "Invalid command!" << endl;
     }
@@ -481,7 +662,7 @@ void executeCommand(const string &command, const string &suffix, const map<strin
  */
 void let(const string& suffix, map<int, string>& expressions)
 {
-    bool debug = true;
+    bool debug = false;
 
     stringstream ss(suffix);
     string infix;
@@ -498,7 +679,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-/|_") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-^/|_") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
@@ -526,11 +707,12 @@ void let(const string& suffix, map<int, string>& expressions)
         {
 
             if(debug){cout << "Postfix ->: " << formatRPN(postfix) << endl;}
-            //            if(invalidInput(postfix))
-            //            {
-            //                return;
-            //            }
-            expressions[int(index) - 65] = rpnEval(postfix);
+//            if(invalidInput(postfix))
+//            {
+//                return;
+//            }
+            if(!rpnEval(postfix).empty())
+                expressions[int(index) - 65] = rpnEval(postfix);
         }
         return;
     }
@@ -538,6 +720,52 @@ void let(const string& suffix, map<int, string>& expressions)
     {
         cout << "Invalid Expression" << endl;
         return;
+    }
+}
+
+void is(const string& suffix, map<int, string> expressions)
+{
+    stringstream ss(suffix);
+    char op1, op2, op;
+    if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ<>=") < suffix.size() || suffix.size() != 3) {
+        cout << "Error, Invalid input" << endl;
+        return;
+    }
+    if(ss>>op1>>op>>op2)
+    {
+        if (!isalpha(op1) || !isalpha(op2)) {
+            cout << "Error, Invalid input" << endl;
+            return;
+        }
+        else if(expressions[int(op1) - 65].empty() || expressions[int(op2) - 65].empty())
+        {
+            cout << "Error, set is empty" << endl;
+            return;
+        }
+        switch(op)
+        {
+            case '<':
+                if(stringLesser(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " << op1 << " is less than " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not less than " << op2 << endl;
+                break;
+            case '>':
+                if(stringGreater(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " <<  op1 << " is greater than " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not greater than " << op2 << endl;
+                break;
+            case '=':
+                if(stringEquality(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                    cout << "TRUE: " <<  op1 << " is equal to " << op2 << endl;
+                else
+                    cout << "FALSE: " << op1 << " is not equal to " << op2 << endl;
+                break;
+            default:
+                cout << "Error, invalid operator found" << endl;
+                return;
+        }
     }
 }
 
@@ -564,7 +792,11 @@ void show(const string& suffix, map<int, string> expressions)
     {
         if(int(suffix[0]-65) < expressions.size())
         {
-            cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
+            if(expressions[int(suffix[0]) -65].empty())
+                cout << "This expression is empty" << endl;
+            else {
+                cout << suffix[0] << " = " << format_result(expressions[int(suffix[0]) -65]) << endl;
+            }
         }
         else
         {
@@ -582,16 +814,27 @@ void list(map<int, string>& expressions)
 {
     bool debug = true;
 
+    bool notempty = false;
+
     //if no expression have been entered throw error
     if (expressions.empty()) {
         cout << "Error, no expressions have been entered" << endl;
         return;
     }
 
-    for(int i = 0; i < expressions.size(); ++i) {
-        cout << char(i+65) << " = ";
-        cout << format_result(expressions[i]) << endl;
+    for(int i = 0; i < expressions.size(); ++i)
+    {
+        if(!expressions[i].empty())
+        {
+            notempty = true;
+            cout << char(i+65) << " = ";
+            cout << format_result(expressions[i]) << endl;
+        }
     }
+
+    if(!notempty)
+        cout << "Error, no expressions have been entered" << endl;
+
 }
 
 //cannot have two ops or operands in a row
@@ -645,6 +888,7 @@ void edit(const string& suffix, map<int, string>& expressions)
 void clear(map<int, string> &expressions)
 {
     expressions.clear();
+    cout << "EXPRESSIONS CLEARED!" << endl << endl;
 }
 
 void exit(const string &suffix, map<int, string> expressions, bool stored)
@@ -739,7 +983,11 @@ void save(const string &suffix, map<int, string> expressions, bool &stored)
     }
 
     for(int i = 0; i < expressions.size(); ++i)
-        out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
+    {
+        //output if expression aren't empty
+        if(!expressions[i].empty())
+            out << char(i + 65) << " = " << format_result(expressions[i]) << endl;
+    }
 
     std::cout << "Save successful." << std::endl;
 
@@ -759,12 +1007,17 @@ void load(const string &suffix, map<int, string>& expressions)
     if((in.fail())) {
         std::cout << "The input file does not exist!" << std::endl;
     } else {
+        cout << endl;
         while (getline(in, line)) {
+            cout << "let " << line << endl;
             trimLineAndStandardize(line);
-            purgeSpaces(line);
-            let(line, expressions);
+            if(purgeSpaces(line))
+                let(line, expressions);
         }
+        cout << endl;
         std::cout << "The file \"" << filename << "\" was loaded! \n";
+        cout << endl;
+
     }
     out.close();
     in.close();
@@ -801,7 +1054,8 @@ string formatInfix(string input)
                 formatted += input[i];
                 while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                       && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                      && input[i+1] != '^')
                 {
                     i++;
                     formatted += input[i];
@@ -826,7 +1080,8 @@ string formatInfix(string input)
                 formatted += input[i];
                 while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                       && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                      && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                      && input[i+1] != '^')
                 {
                     i++;
                     formatted += input[i];
@@ -837,7 +1092,7 @@ string formatInfix(string input)
 
         //-123
         else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/'
-                 || input[i] == '@' || input[i] == '#' || input[i] == '$')
+                 || input[i] == '@' || input[i] == '#' || input[i] == '$' || input[i] == '^')
         {
             formatted += input[i];
             formatted += " ";
@@ -872,7 +1127,8 @@ string formatInfix(string input)
                     formatted += input[i];
                     while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                           && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                          && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                          && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                          && input[i+1] != '^')
                     {
                         i++;
                         formatted += input[i];
@@ -911,13 +1167,26 @@ string formatInfix(string input)
                         formatted += input[i];
                         while(i+1 < input.size() && input[i+1] != '+' && input[i+1] != '/'
                               && input[i+1] != '-' && input[i+1] != '*' && input[i+1] != ' '
-                              && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$')
+                              && input[i+1] != '@' && input[i+1] != '#' && input[i+1] != '$'
+                              && input[i+1] != '^')
                         {
                             i++;
                             formatted += input[i];
                         }
                     }
                     formatted+= " ";
+                }
+                else if( i+2 < input.length() && input[i+2] >= 'A' && input[i+2] <= 'Z')
+                {
+                    if(input[i+1] == '-')
+                    {
+                        formatted += '~';
+                        formatted += " ";
+                    }
+                    formatted += input[i+2];
+                    formatted += " ";
+                    i++;
+                    i++;
                 }
                 else if(i+2 < input.length() && input[i+2] == '(')
                 {
@@ -958,7 +1227,6 @@ string formatInfix(string input)
             formatted += input[i];
             formatted += " ";
         }
-
 
         //throw error
     }
@@ -1008,16 +1276,23 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
         else if(expression[i] >= 'A' && expression[i] <= 'Z')
         {
             string operand = "";
-            operand += expressions[int(expression[i]) - 65];
-            operand += " ";
+            if(expressions[int(expression[i]) - 65].empty())
+            {
+                cout << "Error. An empty set was entered" << endl;
+                return false;
+            }
+            else {
+                operand += expressions[int(expression[i]) - 65];
+                operand += " ";
 
-            //puts space to indicate digit
-            outputQueue += operand;
+                //puts space to indicate digit
+                outputQueue += operand;
+            }
         }
 
         else if (op.count(expression[i]))
         {
-            if(expression[i] == '~' || expression[i] == '!')
+            if(expression[i] == '~')
             {
                 operatorStack.push_back(expression[i]);
                 continue;
@@ -1061,7 +1336,10 @@ bool shuntingYard(string expression, string& postfix, map<int, string>& expressi
     for (size_t i = operatorStack.length() - 1; i != string::npos; --i)
     {
         if(operatorStack[i] == '(')
+        {
+            cout << "Mismatched Parenthesis" << endl;
             return false;
+        }
         outputQueue += operatorStack[i];
         outputQueue += " ";
         operatorStack.pop_back();
@@ -1099,6 +1377,7 @@ string rpnEval(const string& postfix)
                 numbers+= postfix[i+1];
                 i++;
             }
+            numbers = SimplifyFraction(numbers);
             outputStack.push_back(numbers);
         }
         else
@@ -1106,6 +1385,16 @@ string rpnEval(const string& postfix)
             string first, second, result;
             switch(postfix[i])
             {
+            case '^':
+                first = outputStack.back();
+                outputStack.pop_back();
+                second = outputStack.back();
+                outputStack.pop_back();
+                result = Power(second, first);
+                if(result == "{}")
+                    return "";
+                outputStack.push_back(result);
+                break;
             //combination
             case '@':
                 first = outputStack.back();
@@ -1113,6 +1402,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Combination(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             //permutation
@@ -1122,6 +1413,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Permutation(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             //GCD
@@ -1131,18 +1424,24 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = GCD(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '!':
                 first = outputStack.back();
                 outputStack.pop_back();
                 result = Factorial(first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '~':
                 first = outputStack.back();
                 outputStack.pop_back();
                 result = Negate(first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '+':
@@ -1151,6 +1450,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Add(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '-':
@@ -1159,6 +1460,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Subtract(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '*':
@@ -1167,6 +1470,8 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Multiply(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
                 break;
             case '/':
@@ -1175,7 +1480,14 @@ string rpnEval(const string& postfix)
                 second = outputStack.back();
                 outputStack.pop_back();
                 result = Divide(second, first);
+                if(result == "{}")
+                    return "";
                 outputStack.push_back(result);
+                break;
+            case '(':
+            case ')':
+                cout << "Mismatched Parenthesis" << endl;
+                return "";
                 break;
             default:
                 break;
@@ -1195,11 +1507,12 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
-        operators['@'] = 3;
-        operators['#'] = 3;
-        operators['$'] = 3;
+        operators['@'] = 6;
+        operators['#'] = 6;
+        operators['$'] = 6;
+        operators['^'] = 5;
+        operators['~'] = 4;
         operators['!'] = 3;
-        operators['~'] = 3;
         operators['*'] = 2;
         operators['/'] = 2;
         operators['+'] = 1;
@@ -1219,6 +1532,7 @@ void help()
 
     cout << "[LET <exp>]                                Assigns a bignum expression to a memory location!" << endl << endl;
     cout << "[EDIT <exp>]                               Edits the bignum expression stored at a particular memory location!\n\n";
+    cout << "[IS <exp> <relationalOp> <exp>]            Checks = < or > between two saved evaluations!\n\n";
     cout << "[SHOW <exp>]                               Show the content of a particular memory location!" << endl << endl;
     cout << "[LIST]                                     Shows all the big num expression in memory!\n\n";
     cout << "[HELP]                                     Describes the commands of this program!" << endl << endl;

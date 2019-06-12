@@ -395,8 +395,8 @@ std::string Factorial(std::string op, std::string end) { // todo : add threading
 
   // Check for negatives and fractions
   if (op[0] == '-' || op.find('|') != std::string::npos || op.find('_') != std::string::npos) {
-    printf("Invalid input!");
-    return "NaN";
+    printf("Invalid input!\n");
+    return "{}";
   }
 
   // Remove leading zeros
@@ -785,14 +785,14 @@ std::string Combination(std::string op1, std::string op2) {
   if (op1.find('-') != std::string::npos ||
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
+    printf("Error! Invalid input.\n");
     return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
+    printf("Error! Invalid input.\n");
     return "{}";
   }
 
@@ -803,7 +803,7 @@ std::string Combination(std::string op1, std::string op2) {
     op2 = op2.substr(1);
 
   if (IsSmaller(op1, op2)) {
-    printf("Error! Invalid input.");
+    printf("Error! First entry must be larger.\n");
     return "{}";
   }
 
@@ -821,14 +821,14 @@ std::string Permutation(std::string op1, std::string op2) {
   if (op1.find('-') != std::string::npos ||
       op1.find('|') != std::string::npos ||
       op1.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
+    printf("Error! Invalid input.\n");
     return "{}";
   }
 
   if (op2.find('-') != std::string::npos ||
       op2.find('|') != std::string::npos ||
       op2.find('_') != std::string::npos) {
-    printf("Error! Invalid input.");
+    printf("Error! Invalid input.\n");
     return "{}";
   }
 
@@ -840,9 +840,65 @@ std::string Permutation(std::string op1, std::string op2) {
 
   if (IsSmaller(op1, op2))
   {
-    printf("Error! Invalid input. N must be >= R.");
+    printf("Error! Invalid input.\n");
     return "{}";
   }
 
   return SimplifyFraction((Factorial(op1, Subtract(op1, op2))));
+}
+
+bool stringEquality(std::string op1, std::string op2)
+{
+    int i;
+    for(i = 0; i<op1.size(); ++i)
+    {
+        if(op1[i] != op2[i])
+            return false;
+    }
+    if(i < op2.size())
+        return false;
+    return true;
+}
+
+bool stringLesser(std::string op1, std::string op2)
+{
+    //check for empty
+    //check for negatives
+    bool bothNeg = false;
+    /** Handle negatives **/
+    if (op1[0] == '-') {
+      if (op2[0] == '-') {
+        bothNeg = true;
+        op1 = op1.substr(1);
+        op2 = op2.substr(1);
+
+      } else { // op1 (-), op2 (+)
+        return true;
+      }
+    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+      return false;
+    }
+    //check for fractions
+
+    //check for mixed
+
+}
+
+bool stringGreater(std::string op1, std::string op2)
+{
+    //check for negatives
+    bool bothNeg = false;
+    /** Handle negatives **/
+    if (op1[0] == '-') {
+      if (op2[0] == '-') {
+        bothNeg = true;
+        op1 = op1.substr(1);
+        op2 = op2.substr(1);
+
+      } else { // op1 (-), op2 (+)
+        return false;
+      }
+    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+      return true;
+    }
 }
