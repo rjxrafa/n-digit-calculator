@@ -451,8 +451,8 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (op1.empty())
     op1 = "0";
   if (op2.empty()) {
-    printf("Error! Division by zero.");
-    return "NaN";
+    printf("Error! Division by zero.\n");
+    return "{}";
   }
 
   if (op1 == op2) /** Identity Property **/
@@ -611,7 +611,7 @@ std::string GCD(std::string op1, std::string op2) {
 
   if (op2.empty() || op1.empty()) {
     printf("Divison by zero! Error.\n");
-    return "NaN";
+    return "{}";
   }
 
   if (IsSmaller(op1, op2))
