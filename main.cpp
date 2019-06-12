@@ -750,19 +750,19 @@ void is(const string& suffix, map<int, string> expressions)
         switch(op)
         {
             case '<':
-                if(stringLesser(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(LessThan(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " << op1 << " is less than " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not less than " << op2 << endl;
                 break;
             case '>':
-                if(stringGreater(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(GreaterThan(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " <<  op1 << " is greater than " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not greater than " << op2 << endl;
                 break;
             case '=':
-                if(stringEquality(expressions[int(op1) - 65], expressions[int(op2) - 65]))
+                if(EqualTo(expressions[int(op1) - 65], expressions[int(op2) - 65]))
                     cout << "TRUE: " <<  op1 << " is equal to " << op2 << endl;
                 else
                     cout << "FALSE: " << op1 << " is not equal to " << op2 << endl;
@@ -1512,16 +1512,16 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
-        operators['@'] = 6;
-        operators['#'] = 6;
-        operators['$'] = 6;
-        operators['^'] = 5;
-        operators['~'] = 4;
-        operators['!'] = 3;
-        operators['*'] = 2;
-        operators['/'] = 2;
-        operators['+'] = 1;
-        operators['-'] = 1;
+        operators['@'] = 6; // Combination
+        operators['#'] = 6; // Permutation
+        operators['$'] = 6; // GCD
+        operators['^'] = 5; // Power
+        operators['~'] = 4; // Negate
+        operators['!'] = 3; // Factorial
+        operators['*'] = 2; // Multiply
+        operators['/'] = 2; // Divide
+        operators['+'] = 1; // Add
+        operators['-'] = 1; // Subtract
         return true;
     } catch (...) {
         return false;

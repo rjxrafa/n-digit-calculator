@@ -388,7 +388,7 @@ std::string Multiply(std::string op1, std::string op2) {
  * @param threaded
  * @return
  */
-std::string Factorial(std::string op) { // todo : add threading operation
+std::string Factorial(std::string op, std::string end) { // todo : add threading operation
 
   if (op == "0")
     return "1";
@@ -403,13 +403,14 @@ std::string Factorial(std::string op) { // todo : add threading operation
   while (op[0] == '0')
     op = op.substr(1);
 
-  std::string factorial = "1",
-              temp = "1",
-              increment = "1";
+  std::string factorial = op,
+              counter = op,
+              decrement = "1";
 
-  while (temp != op) {
-    temp = Add(temp, increment);
-    factorial = Multiply(factorial, temp);
+  counter = Subtract(counter, decrement);
+  while (counter != end) { // Count down to 1 from
+    factorial = Multiply(factorial, counter);
+    counter = Subtract(counter, decrement);
   }
 
   return factorial;
@@ -449,8 +450,8 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (op1.empty())
     op1 = "0";
   if (op2.empty()) {
-    printf("Error! Division by zero.\n");
-    return "{}";
+    printf("Error! Division by zero.");
+    return "NaN";
   }
 
   if (op1 == op2) /** Identity Property **/
@@ -492,7 +493,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
       if (op1_mixed != "0") // op1 has mixed, add to op1's numerator
         op1 = Add(Multiply(op1_mixed, op1_denominator), op1);
       if (op2_mixed != "0") // op2 has mixed, add to op2's numerator
-        op2 = Add(Multiply(op2_mixed, op2_denominator), op2);
+        op2 = Add(Multiply(op1_mixed, op2_denominator), op2);
 
       if (negative)
         op1 = '-'+op1;
@@ -609,7 +610,7 @@ std::string GCD(std::string op1, std::string op2) {
 
   if (op2.empty() || op1.empty()) {
     printf("Divison by zero! Error.\n");
-    return "{}";
+    return "NaN";
   }
 
   if (IsSmaller(op1, op2))
@@ -672,7 +673,8 @@ std::string SimplifyFraction(std::string op) {
 
   /** Check if operand is a mixed number **/
   if (op.find('_') != std::string::npos) {
-    getline(ss, mixed, '_'); // Retrieve mixed
+    ss >> mixed;
+    ss.get(); // Remove space
   }
 
   getline(ss, numerator, '|'); // Retrieve numerator & denominator
@@ -721,9 +723,6 @@ void NormalizeFractions(std::string &op1, std::string &op2) {
   while (op2[0] == '0') {
     op2 = op2.substr(1);
   }
-
-  if (op1.empty() || op2.empty())
-    return;
 
   std::string op1_mixed,
               op1_numerator,
@@ -801,7 +800,7 @@ std::string Combination(std::string op1, std::string op2) {
     op2 = op2.substr(1);
 
   if (IsSmaller(op1, op2)) {
-    printf("Error! first entry must be larger.\n");
+    printf("Error! First entry must be larger.\n");
     return "{}";
   }
 
@@ -842,67 +841,76 @@ std::string Permutation(std::string op1, std::string op2) {
     return "{}";
   }
 
-  std::string numerator,
-      denominator;
-
-  numerator = (Factorial(op1));
-  denominator = (Factorial(Subtract(op1, op2)));
-
-  return SimplifyFraction(numerator+"|"+denominator);
+  return SimplifyFraction((Factorial(op1, Subtract(op1, op2))));
 }
 
-bool stringEquality(std::string op1, std::string op2)
-{
-    int i;
-    for(i = 0; i<op1.size(); ++i)
-    {
-        if(op1[i] != op2[i])
-            return false;
-    }
-    if(i < op2.size())
-        return false;
-    return true;
-}
+bool EqualTo(std::string op1, std::string op2) {
 
-bool stringLesser(std::string op1, std::string op2)
-{
-    //check for empty
-    //check for negatives
-    bool bothNeg = false;
-    /** Handle negatives **/
-    if (op1[0] == '-') {
-      if (op2[0] == '-') {
-        bothNeg = true;
-        op1 = op1.substr(1);
-        op2 = op2.substr(1);
+  NormalizeFractions(op1,op2);
 
-      } else { // op1 (-), op2 (+)
-        return true;
-      }
-    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+  int i;
+
+  for(i = 0; i < op1.size(); ++i)
+    if(op1[i] != op2[i])
       return false;
-    }
-    //check for fractions
 
-    //check for mixed
-
+  return i == op2.size();
 }
 
-bool stringGreater(std::string op1, std::string op2)
-{
-    //check for negatives
-    bool bothNeg = false;
-    /** Handle negatives **/
-    if (op1[0] == '-') {
-      if (op2[0] == '-') {
-        bothNeg = true;
-        op1 = op1.substr(1);
-        op2 = op2.substr(1);
+bool LessThan(std::string op1, std::string op2) {
 
-      } else { // op1 (-), op2 (+)
-        return false;
-      }
-    } else if (op2[0] == '-') { // op1 (+), op2 (-)
+  NormalizeFractions(op1,op2);
+  /** Handle negatives **/
+  bool negative = false; // If both are negative, invert results
+  if (op1[0] == '-') { // If op1 is negative and op2 is not negative, return true
+    if (op2[0] != '-') {
       return true;
     }
+    op1 = op1.substr(0); // Trim negatives for next step
+    op2 = op2.substr(0);
+    negative = true;
+  } else if (op2[0] == '-') // if op2 is negative and op1 is positive, return false
+    return false;
+
+  if (op1 == op2)
+    return false;
+
+  std::string op1_numerator, op2_numerator;
+  std::stringstream ss(op1);
+  getline(ss, op1_numerator, '|');
+  ss.clear();
+  ss.str(op2);
+  getline(ss, op2_numerator, '|');
+
+  return (negative) ? (!IsSmaller(op1_numerator, op2_numerator)) :
+                      (IsSmaller(op1_numerator, op2_numerator));
+}
+
+bool GreaterThan(std::string op1, std::string op2)
+{
+  NormalizeFractions(op1,op2);
+  /** Handle negatives **/
+  bool negative = false; // If both are negative, invert results
+  if (op1[0] == '-') { // If op1 is negative and op2 is not negative, return false
+    if (op2[0] != '-') {
+      return false;
+    }
+    op1 = op1.substr(0); // Trim negatives for next step
+    op2 = op2.substr(0);
+    negative = true;
+  } else if (op2[0] == '-') // if op2 is negative and op1 is positive, return false
+    return true;
+
+  if (op1 == op2)
+    return false;
+
+  std::string op1_numerator, op2_numerator;
+  std::stringstream ss(op1);
+  getline(ss, op1_numerator, '|');
+  ss.clear();
+  ss.str(op2);
+  getline(ss, op2_numerator, '|');
+
+  return (negative) ? (IsSmaller(op1_numerator, op2_numerator)) :
+         (!IsSmaller(op1_numerator, op2_numerator));
 }

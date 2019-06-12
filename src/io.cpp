@@ -16,7 +16,7 @@ bool GetInput(std::string &input, std::string &&question) {
   getline(std::cin, input);
   fflush(stdin);
 
-  if (input.find_first_not_of("^!1234567890*+-_/ |") < input.size()) {
+  if (input.find_first_not_of("~@#$^!1234567890*+-_/ |") < input.size()) {
     printf("Invalid input!\n");
     return false;
   } else {
