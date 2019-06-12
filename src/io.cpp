@@ -30,9 +30,24 @@ bool GetInput(std::string &input, std::string &&question) {
  * @param input
  * @return
  */
-std::string CommaSeparator(const std::string &input) {
-  //todo, take fractions into account.
-  std::string result;
+std::string CommaSeparator(std::string input) {
+  std::string result, numerator, denominator, mixed;
+  bool mixed_num_exists = false;
+
+  if (input.find('|') != std::string::npos) {
+    std::stringstream ss(input);
+    if (input.find('_') != std::string::npos) {
+      mixed_num_exists = true;
+      getline(ss, input, '_');
+    }
+    getline(ss, numerator, '|');
+    getline(ss, denominator);
+    numerator = CommaSeparator(numerator);
+    denominator = CommaSeparator(denominator);
+    if (!mixed_num_exists)
+      return (numerator + '|' + denominator);
+  }
+
   bool negative = false;
 
   //if negative set negative to true
@@ -40,7 +55,7 @@ std::string CommaSeparator(const std::string &input) {
     negative = true;
 
   unsigned int count = 0;
-  //add comma every three spaces
+  //add comma every three digits
   for (auto i = input.rbegin(); i != input.rend(); ++i, ++count) {
     if ((count % 3) == 0)
       result = ',' + result;
@@ -56,11 +71,11 @@ std::string CommaSeparator(const std::string &input) {
   if (result[result.size()-1] == ',')
     result.erase(result.size()-1);
 
-  //adds negative
-  if (negative)
+  // adds negative
+  if (negative && !result.empty())
     result.insert(result.begin(), '-');
 
-  return result;
+  return (mixed_num_exists) ? (result + '_' + numerator + '|' + denominator) : result;
 }
 
 
