@@ -36,6 +36,7 @@ void load(const string &suffix, map<int, string>& expressions);
 bool shuntingYard(string expression, string& postfix, map<int, string>& expressions);
 string rpnEval(const string& postfix);
 bool loadPrecedence(map<char, int> &operators);
+bool invalidInput(string invalidInput);
 string format_result(string result);
 string formatRPN(string rpn);
 void help();
@@ -774,10 +775,11 @@ void let(const string& suffix, map<int, string>& expressions)
         {
 
             if(debug){cout << "Postfix ->: " << formatRPN(postfix) << endl;}
-//            if(invalidInput(postfix))
-//            {
-//                return;
-//            }
+            if(invalidInput(postfix))
+            {
+                cout << "Invalid Input" << endl;
+                return;
+            }
             if(!rpnEval(postfix).empty())
                 expressions[int(index) - 65] = rpnEval(postfix);
         }
@@ -1091,6 +1093,60 @@ void load(const string &suffix, map<int, string>& expressions)
     in.close();
 }
 
+bool invalidInput(string suffix)
+{
+    char data;
+    int operators(0), operands(0);
+    int count(0), posA, posB;
+    bool balance;
+    if(suffix.find("{{") < suffix.size() ||
+       suffix.find("}}") < suffix.size())
+    {
+        cout << "Mismatched Brackets" << endl;
+        return true;
+    }
+    if(suffix.find(",,") < suffix.size() ||
+       suffix.find("{,") < suffix.size())
+    {
+        cout << "Mismatched commas" << endl;
+        return true;
+    }
+    if(suffix.find("(") < suffix.size() ||
+       suffix.find(")") < suffix.size())
+    {
+        cout << "Mismatched Parenthesis" << endl;
+        return true;
+    }
+
+    //check if equal amount of operands or operators
+    for(int i = 0; i < suffix.size(); ++i)
+    {
+        if(isalpha(suffix[i]))
+            operands++;
+        if(isdigit(suffix[i]))
+        {
+            //check for mixed numbers or mixed numbers
+            while(i+1 < suffix.size() && (isdigit(suffix[i+1]) || suffix[i+1] == '_'
+                                            || suffix[i+1] == '|'))
+            {
+                i++;
+            }
+            //puts space to seperate digits
+            operands++;
+        }
+        else if(suffix[i]!= '~' && suffix[i]!= '!' && suffix[i]!= '|' && suffix[i] != ' ')
+            operators++;
+    }
+
+    balance = (operands == operators+1);
+    if(!balance)
+    {
+        cout << "Unbalanced expression given" << endl;
+        return true;
+    }
+
+    return false;
+}
 string formatInfix(string input)
 {
     //removes all whitespaces
@@ -1679,9 +1735,79 @@ bool REPL(map<int, string> &expressions) {
             return true;
         }
     }
-    catch (...) { // todo :: this doesnt seem to catch errors
+    catch (...) {
         printf("Error! Exiting REPL mode");
         return false;
     }
     return true;
 }
+
+/* Sample Program
+ * **********************************************************************
+The purpose of this program is to evaluate large number expressions
+**********************************************************************
+Command: load goodstuff
+
+let a = 1800/24
+let b = 2000/4000
+let c = 20,000 2000/4000
+let d = -(-(-(-(-(-(320*12))))))
+let e = 32 / 3
+let f = 33 / 3
+let g = 2 2/3 * 3/4
+let h = 500 1 / 1000 + 123 - 123
+let i = (230--12)--12
+let j = (32+32)*12*12/3
+let k = gcd(20,4)
+let l = c(8,6)
+let m = p(12,3)
+let n = (--b + 30!)/2
+let o = -(1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1)
+let p = 500,000,000,000,000,000,000,000,000,000 / -100 / -100 / -100 / -100 / -100
+let q = 78 1 / 18 - 23
+let r = 22 1/2 / -12 / -12 / -12
+let s = 2   2/    3 * 12
+let t = -3200000000000000000 1/100000000000 + 1 1/2
+let u = 3! / p (4,2) * (gcd(50,10) + c(5,4))
+let v = 2 + ((100!-100!) + (32-32))! - 3
+let w = -23 2/3 + 23 2/3 * 23 2/3 / 23 2/3
+let x = (((p(50,2) - p(50,2)) + c(f,1)) * 1000) / gcd(110, 11)
+let y = 300000000000000000 20000000000/2000000000 + 3!
+let z = -------------------------------(-(-(-(-(-(-(- ((c(100,2) * p(100,2)) + (gcd(100, 50) / (2 2/3 - 3!)) ))))))))
+
+The file "GOODSTUFF.exp" was loaded!
+
+Command: list
+A = 75
+B = 1/2
+C = 20,000 1/2
+D = 3,840
+E = 10 2/3
+F = 11
+G = 2
+H = 500 1/1,000
+I = 254
+J = 3,072
+K = 4
+L = 28
+M = 1,320
+N = 132,626,429,906,095,529,318,154,240,000,000 1/4
+O = 18
+P = -50,000,000,000,000,000,000
+Q = 55 1/18
+R = -5/384
+S = 32
+T = -3,199,999,999,999,999,998 50,000,000,001/100,000,000,000
+U = 7 1/2
+V = 0
+W = -22 1,123/1,682
+X = 1,000
+Y = 300,000,000,000,000,016
+Z = 49,004,850
+Command: save goodstuff_answers
+Save successful.
+Command:
+Thank You!
+Press <RETURN> to close this window...
+*/
+
