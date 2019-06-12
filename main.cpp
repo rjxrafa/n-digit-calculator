@@ -1507,16 +1507,16 @@ bool loadPrecedence(map<char, int> &operators)
     try
     {
         //need to implement negatives
-        operators['@'] = 6;
-        operators['#'] = 6;
-        operators['$'] = 6;
-        operators['^'] = 5;
-        operators['~'] = 4;
-        operators['!'] = 3;
-        operators['*'] = 2;
-        operators['/'] = 2;
-        operators['+'] = 1;
-        operators['-'] = 1;
+        operators['@'] = 6; // Combination
+        operators['#'] = 6; // Permutation
+        operators['$'] = 6; // GCD
+        operators['^'] = 5; // Power
+        operators['~'] = 4; // Negate
+        operators['!'] = 3; // Factorial
+        operators['*'] = 2; // Multiply
+        operators['/'] = 2; // Divide
+        operators['+'] = 1; // Add
+        operators['-'] = 1; // Subtract
         return true;
     } catch (...) {
         return false;

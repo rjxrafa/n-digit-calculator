@@ -508,7 +508,7 @@ std::string Divide(std::string op1, std::string op2, const bool &&mod) {
   if (IsSmaller(op1, op2)) {
     if (negative)
       op1 = '-'+op1;
-    return op1 + "|"+ op2;
+    return SimplifyFraction(op1 + "|"+ op2);
   } else {
 
     /**
