@@ -30,6 +30,7 @@ std::string CommaSeparator(std::string input) {
   std::string result, numerator, denominator, mixed;
   bool mixed_num_exists = false;
 
+
   if (input.find('|') != std::string::npos) {
     std::stringstream ss(input);
     if (input.find('_') != std::string::npos) {

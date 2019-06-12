@@ -278,6 +278,7 @@ std::string Multiply(std::string op1, std::string op2) {
     op1 = op1.substr(1);
   }
 
+
   if (op2[0] == '-') {
     negative = !negative;
     op2 = op2.substr(1);

@@ -86,7 +86,6 @@ void loadCommands(map<string, int> &commands)
     commands["CLEAR"] = 9;
     commands["REPL"]  = 10;
     commands["IS"]  = 11;
-
 }
 
 /**
@@ -684,7 +683,7 @@ void let(const string& suffix, map<int, string>& expressions)
         return;
     }
     //if there are any chars other than valid input or if there are no variables in the suffix
-    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-^/|_") < suffix.size())
+    else if(suffix.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*=+!()-/|_") < suffix.size())
     {
         cout << "Error, Invalid character input" << endl;
         return;
